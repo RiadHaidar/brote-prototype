@@ -1,0 +1,3716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Brote Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&amp;display=swap">
+<style>
+/* Single deliberate light look: warm cream app on a sand backdrop (matches the project deck). */
+:root {
+  --cream: #FBF7F0;
+  --paper: #FFFDF9;
+  --sand: #F3EBDD;
+  --line: #E7DECF;
+  --ink: #1D2B3A;
+  --ink2: #4F5D6C;
+  --ink3: #7A8593;
+  --orange: #C2410C;
+  --orange-soft: #FBE6D8;
+  --teal: #0F766E;
+  --teal-soft: #DCEFEA;
+  --leaf: #3C8C5A;
+  --leaf2: #62AE6F;
+  --wilt: #A8874E;
+  --wilt2: #C9AC72;
+  --clay: #C9855D;
+  --clay2: #AE6A44;
+  --sun: #F0B23C;
+  --petal: #E46F4E;
+  --good: #0F766E;
+  --bad: #C2410C;
+  --backdrop: #EDE5D7;
+  --r: 18px;
+  --shadow: 0 1px 0 rgba(29, 43, 58, .04), 0 6px 18px -8px rgba(29, 43, 58, .18);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+#root { height: 100%; }
+body {
+  background: var(--backdrop);
+  color: var(--ink);
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--teal); }
+a:hover { color: var(--orange); }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; padding: 0; }
+h1, h2, h3, .fred { font-family: 'Fredoka', 'Nunito Sans', sans-serif; font-weight: 600; letter-spacing: -.01em; margin: 0; }
+p { margin: 0; text-wrap: pretty; }
+
+/* ---------- Stage: guide + phone ---------- */
+.stage { min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 48px; padding: 32px 24px; }
+.guide { width: 280px; display: flex; flex-direction: column; gap: 18px; max-height: calc(100vh - 64px); overflow-y: auto; scrollbar-width: thin; padding-right: 6px; }
+@media (min-width: 761px) and (max-height: 930px) { .phone { zoom: .9; } }
+@media (min-width: 761px) and (max-height: 830px) { .phone { zoom: .8; } }
+@media (min-width: 761px) and (max-height: 740px) { .phone { zoom: .7; } }
+.guide h1 { font-size: 30px; display: flex; align-items: center; gap: 10px; }
+.guide .lead { color: var(--ink2); font-size: 14px; line-height: 1.5; }
+.guide-group { display: flex; flex-direction: column; gap: 4px; }
+.guide-group h4 { margin: 6px 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); font-weight: 800; }
+.guide-link { text-align: left; font-size: 14px; padding: 7px 10px; border-radius: 10px; color: var(--ink); display: flex; justify-content: space-between; gap: 8px; }
+.guide-link:hover { background: rgba(255, 255, 255, .6); }
+.guide-link.on { background: var(--paper); box-shadow: var(--shadow); font-weight: 700; }
+.guide-link small { color: var(--ink3); font-weight: 600; }
+.seg { display: flex; background: rgba(255, 255, 255, .55); border-radius: 12px; padding: 3px; gap: 3px; }
+.seg button { flex: 1; padding: 8px 6px; border-radius: 9px; font-size: 13px; font-weight: 700; color: var(--ink2); }
+.seg button.on { background: var(--paper); color: var(--ink); box-shadow: var(--shadow); }
+.guide .note { font-size: 12px; color: var(--ink3); line-height: 1.5; }
+
+.phone {
+  width: 390px; height: 844px; flex: none;
+  border-radius: 54px; background: var(--ink); padding: 11px;
+  box-shadow: 0 30px 60px -20px rgba(29, 43, 58, .45), inset 0 0 0 2px #2c3d50;
+}
+.screen {
+  position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: hidden;
+  background: var(--cream); display: flex; flex-direction: column;
+}
+.statusbar { height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 28px 0 32px; font-size: 14px; font-weight: 800; }
+.statusbar .notch { width: 96px; height: 26px; border-radius: 20px; background: var(--ink); }
+.statusbar .sys { display: flex; gap: 5px; align-items: center; }
+.statusbar .sys i { display: block; width: 16px; height: 9px; border-radius: 3px; border: 2px solid var(--ink); }
+.statusbar .sys b { display: block; width: 4px; height: 9px; border-radius: 1px; background: var(--ink); }
+
+@media (max-width: 760px) {
+  .guide { display: none; }
+  .stage { padding: 0; }
+  .stage { min-height: 0; height: 100%; }
+  .phone { width: 100%; height: 100%; border-radius: 0; padding: 0; box-shadow: none; }
+  .screen { border-radius: 0; }
+}
+
+/* ---------- Generic screen bits ---------- */
+.body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 6px 20px 24px; display: flex; flex-direction: column; gap: 16px; scrollbar-width: none; }
+.body::-webkit-scrollbar { display: none; }
+.card { background: var(--paper); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px; }
+.muted { color: var(--ink2); }
+.tiny { font-size: 12px; }
+.sm { font-size: 14px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.col { display: flex; flex-direction: column; gap: 10px; }
+.between { justify-content: space-between; }
+.grow { flex: 1; min-width: 0; }
+.eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); }
+
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 22px; border-radius: 16px; font-weight: 800; font-size: 16px; transition: transform .12s ease, box-shadow .12s ease; }
+.btn:active { transform: translateY(2px); }
+.btn.primary { background: var(--orange); color: #fff; box-shadow: 0 4px 0 #8f2f08; }
+.btn.primary:active { box-shadow: 0 2px 0 #8f2f08; }
+.btn.teal { background: var(--teal); color: #fff; box-shadow: 0 4px 0 #0a524c; }
+.btn.ghost { background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1.5px var(--line) inset; }
+.btn.small { min-height: 40px; font-size: 14px; padding: 0 14px; border-radius: 12px; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+.link { font-weight: 700; color: var(--teal); font-size: 14px; }
+
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; font-size: 13px; font-weight: 800; background: var(--paper); box-shadow: var(--shadow); }
+.flame { width: 12px; height: 15px; background: var(--orange); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; position: relative; }
+.flame::after { content: ''; position: absolute; left: 3px; bottom: 2px; width: 6px; height: 7px; border-radius: 50%; background: var(--sun); }
+.frost { width: 13px; height: 13px; border-radius: 3px; background: #8EC5D6; transform: rotate(45deg); box-shadow: inset 0 0 0 3px #CBE7EF; }
+
+.topbar { display: flex; align-items: center; gap: 10px; padding: 4px 20px 8px; min-height: 48px; }
+.iconbtn { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--paper); box-shadow: var(--shadow); font-weight: 800; font-size: 18px; flex: none; }
+.x::before, .x::after { content: ''; position: absolute; width: 16px; height: 2.5px; border-radius: 2px; background: var(--ink); }
+.x { position: relative; }
+.x::before { transform: rotate(45deg); }
+.x::after { transform: rotate(-45deg); }
+.back::before { content: ''; width: 10px; height: 10px; border-left: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); transform: translateX(2px) rotate(45deg); }
+
+/* ---------- Tab bar ---------- */
+.tabbar { flex: none; display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px 10px 22px; background: var(--paper); border-top: 1px solid var(--line); }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--ink3); padding: 6px 0; }
+.tab.on { color: var(--ink); }
+.tab .ti { width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center; }
+.tab.on .ti { background: var(--orange-soft); }
+.ti-garden { width: 12px; height: 14px; background: currentColor; border-radius: 0 100% 0 100%; transform: rotate(-45deg); }
+.ti-play { width: 0; height: 0; border-left: 12px solid currentColor; border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 3px; }
+.ti-journey { width: 14px; height: 14px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid currentColor; }
+.ti-friends { width: 23px; height: 12px; position: relative; }
+.ti-friends::before, .ti-friends::after { content: ''; position: absolute; top: 0; width: 11px; height: 11px; border-radius: 50%; border: 2.5px solid currentColor; }
+.ti-friends::before { left: 0; } .ti-friends::after { right: 0; }
+.tab.on .ti-garden, .tab.on .ti-play { color: var(--orange); }
+
+/* ---------- Plants ---------- */
+.plant { position: relative; width: 56px; height: 66px; flex: none; transform-origin: bottom center; }
+.plant .pot { position: absolute; bottom: 0; left: 50%; width: 26px; height: 15px; transform: translateX(-50%); background: var(--clay); border-radius: 2px 2px 8px 8px; }
+.plant .pot::before { content: ''; position: absolute; top: -4px; left: -3px; right: -3px; height: 6px; border-radius: 3px; background: var(--clay2); }
+.plant .stem { position: absolute; bottom: 14px; left: calc(50% - 1.5px); width: 3px; border-radius: 3px; background: var(--leaf); transform-origin: bottom center; transition: transform .8s cubic-bezier(.3, 1.6, .5, 1), height .6s ease, background .6s; }
+.plant .leaf { position: absolute; width: 15px; height: 9px; background: var(--leaf2); border-radius: 0 100% 0 100%; transition: transform .8s cubic-bezier(.3, 1.6, .5, 1), background .6s; }
+.plant .leaf.l { right: 1px; bottom: 30%; transform-origin: right bottom; transform: rotate(-12deg) scaleX(-1); border-radius: 100% 0 100% 0; }
+.plant .leaf.r { left: 1px; bottom: 48%; transform-origin: left bottom; transform: rotate(-22deg); }
+.plant .leaf.l2 { right: 1px; bottom: 70%; transform-origin: right bottom; transform: rotate(-30deg) scaleX(-1) scale(.8); border-radius: 100% 0 100% 0; }
+.plant .flower { position: absolute; top: -5px; left: 50%; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--sun); box-shadow: 0 -6px 0 0 var(--fc, var(--petal)), 6px -1px 0 0 var(--fc, var(--petal)), 4px 5px 0 0 var(--fc, var(--petal)), -4px 5px 0 0 var(--fc, var(--petal)), -6px -1px 0 0 var(--fc, var(--petal)); }
+.plant .bud { position: absolute; top: -4px; left: 50%; width: 7px; height: 9px; margin-left: -3.5px; border-radius: 50% 50% 45% 45%; background: var(--wilt2); }
+.plant.sprout .stem { height: 16px; }
+.plant.sprout .leaf.r, .plant.sprout .leaf.l2 { display: none; }
+.plant.sprout .leaf.l { bottom: 45%; }
+.plant.leafy .stem { height: 28px; }
+.plant.leafy .leaf.l2 { display: none; }
+.plant.bloom .stem { height: 34px; }
+.plant.wilt .stem { height: 24px; background: var(--wilt); transform: rotate(24deg); }
+.plant.wilt .leaf { background: var(--wilt2); }
+.plant.wilt .leaf.l { transform: rotate(40deg) scaleX(-1); }
+.plant.wilt .leaf.r { transform: rotate(48deg); }
+.plant.wilt .leaf.l2 { display: none; }
+.plant.wilt .pot { background: #C49A7F; }
+.plant.glow { animation: revive 1.4s cubic-bezier(.3, 1.6, .5, 1) both; }
+.plant.glow::after { content: ''; position: absolute; left: 50%; top: 46%; width: 70px; height: 70px; margin: -35px 0 0 -35px; border-radius: 50%; background: radial-gradient(circle, rgba(240, 178, 60, .45), rgba(240, 178, 60, 0) 70%); animation: halo 2.4s ease-out both; pointer-events: none; z-index: -1; }
+@keyframes revive { 0% { transform: scale(.7); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes halo { 0% { opacity: 0; transform: scale(.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.4); } }
+
+/* garden */
+.bed { padding: 14px 12px 10px; }
+.bed-head { display: flex; justify-content: space-between; align-items: baseline; padding: 0 4px 6px; }
+.bed-head h3 { font-size: 17px; }
+.bed-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); row-gap: 6px; position: relative; }
+.bed-grid::before { content: ''; position: absolute; left: 4px; right: 4px; bottom: 26px; height: 10px; border-radius: 6px; background: var(--sand); }
+.pcell { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 2px 0; border-radius: 12px; position: relative; }
+.pcell:hover { background: rgba(243, 235, 221, .5); }
+.pcell .plant { transform: scale(1.05); margin: 4px 0 -2px; }
+.pcell .wlabel { font-size: 10px; font-weight: 800; color: var(--ink2); white-space: nowrap; letter-spacing: -.01em; }
+.pcell.danger .wlabel { color: var(--orange); }
+
+.goalring { width: 64px; height: 64px; position: relative; flex: none; }
+.goalring svg { transform: rotate(-90deg); }
+.goalring .num { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Fredoka'; font-weight: 600; font-size: 16px; }
+
+.danger-card { display: flex; align-items: center; gap: 12px; background: var(--orange-soft); border-radius: var(--r); padding: 12px 14px; text-align: left; width: 100%; }
+.danger-card .mini { display: flex; margin-right: -4px; }
+.danger-card .mini .plant { transform: scale(.75); margin: -8px -10px -4px; }
+
+/* bottom sheet */
+.scrim { position: absolute; inset: 0; background: rgba(29, 43, 58, .35); z-index: 70; animation: fade .2s ease both; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 71; background: var(--paper); border-radius: 26px 26px 0 0; padding: 10px 22px 30px; display: flex; flex-direction: column; gap: 14px; animation: up .28s cubic-bezier(.2, .9, .3, 1) both; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 4px; }
+@keyframes up { from { transform: translateY(100%); } }
+@keyframes fade { from { opacity: 0; } }
+.bar { height: 10px; border-radius: 6px; background: var(--sand); overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: 6px; background: var(--teal); transition: width .5s ease; }
+
+.toast { position: absolute; left: 20px; right: 20px; bottom: 100px; z-index: 90; background: var(--ink); color: #fff; padding: 12px 16px; border-radius: 14px; font-size: 14px; font-weight: 700; animation: up .25s ease both; text-align: center; }
+
+/* ---------- Onboarding ---------- */
+.onb { flex: 1; display: flex; flex-direction: column; padding: 8px 24px 28px; gap: 18px; overflow-y: auto; }
+.brandmark { display: flex; align-items: flex-end; gap: 6px; }
+.brandmark .word { font-family: 'Fredoka'; font-weight: 700; font-size: 40px; line-height: 1; letter-spacing: -.02em; }
+.dir-card { display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 20px; background: var(--paper); box-shadow: var(--shadow); text-align: left; width: 100%; transition: transform .15s; }
+.dir-card:hover { transform: translateY(-2px); }
+.dir-card .flag { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-family: 'Fredoka'; font-weight: 700; font-size: 16px; flex: none; }
+.dir-card .flag.en { background: var(--teal-soft); color: var(--teal); }
+.dir-card .flag.es { background: var(--orange-soft); color: var(--orange); }
+.dir-card h3 { font-size: 19px; }
+.arrow-r { width: 10px; height: 10px; border-right: 2.5px solid var(--ink3); border-top: 2.5px solid var(--ink3); transform: rotate(45deg); flex: none; }
+.steps { display: flex; gap: 6px; }
+.steps i { flex: 1; height: 6px; border-radius: 4px; background: var(--line); }
+.steps i.on { background: var(--orange); }
+.pchips { display: flex; flex-wrap: wrap; gap: 10px; }
+.pchip { padding: 12px 16px; border-radius: 14px; background: var(--paper); box-shadow: 0 0 0 1.5px var(--line) inset; font-weight: 800; font-size: 15px; transition: all .15s; }
+.pchip.on { background: var(--teal); color: #fff; box-shadow: 0 0 0 1.5px var(--teal) inset; }
+.goal-opt { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 18px; background: var(--paper); box-shadow: 0 0 0 1.5px var(--line) inset; text-align: left; width: 100%; }
+.goal-opt.on { box-shadow: 0 0 0 2.5px var(--orange) inset; background: #FFF8F2; }
+.goal-opt .dots { display: flex; gap: 3px; align-items: flex-end; width: 34px; }
+.goal-opt .dots i { width: 8px; border-radius: 3px; background: var(--line); }
+.goal-opt.on .dots i.f { background: var(--orange); }
+.goal-opt .dots i.f { background: var(--ink3); }
+.result-note { background: var(--teal-soft); color: #0b4f49; border-radius: 14px; padding: 12px 14px; font-weight: 700; font-size: 14px; animation: up .25s ease both; }
+
+/* ---------- Games ---------- */
+.game-card { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: var(--r); background: var(--paper); box-shadow: var(--shadow); text-align: left; width: 100%; transition: transform .15s; }
+.game-card:hover { transform: translateY(-2px); }
+.gicon { width: 54px; height: 54px; border-radius: 16px; flex: none; position: relative; display: grid; place-items: center; }
+.gicon.memory { background: var(--orange-soft); }
+.gicon.memory::before, .gicon.memory::after { content: ''; position: absolute; width: 18px; height: 24px; border-radius: 5px; background: var(--orange); }
+.gicon.memory::before { transform: translate(-6px, 2px) rotate(-10deg); opacity: .55; }
+.gicon.memory::after { transform: translate(6px, -2px) rotate(8deg); }
+.gicon.sort { background: var(--teal-soft); }
+.gicon.sort::before { content: ''; width: 28px; height: 22px; border: 3px solid var(--teal); border-top: 0; border-radius: 0 0 8px 8px; position: absolute; bottom: 12px; }
+.gicon.sort::after { content: ''; width: 12px; height: 12px; border-radius: 3px; background: var(--teal); position: absolute; top: 10px; transform: rotate(15deg); }
+.gicon.listen { background: #F7EEDB; }
+.gicon.listen::before { content: ''; width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--sun); border-left-color: transparent; border-bottom-color: transparent; transform: rotate(45deg); position: absolute; left: 20px; }
+.gicon.listen::after { content: ''; width: 10px; height: 14px; background: #B7821A; border-radius: 3px; position: absolute; left: 13px; }
+.gicon.rorw { background: #E9E6F3; }
+.gicon.rorw::before { content: ''; width: 22px; height: 28px; border-radius: 6px; background: #5B5592; transform: rotate(-12deg); }
+.gicon.locked { background: var(--sand); }
+.gicon.locked::before { content: ''; width: 16px; height: 12px; border-radius: 3px; background: var(--ink3); position: absolute; bottom: 15px; }
+.gicon.locked::after { content: ''; width: 10px; height: 10px; border: 3px solid var(--ink3); border-bottom: 0; border-radius: 8px 8px 0 0; position: absolute; top: 14px; }
+.soon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.soon { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; background: rgba(255, 253, 249, .6); box-shadow: 0 0 0 1.5px var(--line) inset; color: var(--ink2); font-weight: 800; font-size: 13px; }
+.soon .gicon { width: 34px; height: 34px; border-radius: 10px; transform: scale(.9); }
+.soon .gicon.locked::before { width: 12px; height: 9px; bottom: 9px; }
+.soon .gicon.locked::after { width: 8px; height: 7px; border-width: 2.5px; top: 8px; }
+
+.ghead { display: flex; align-items: center; gap: 10px; padding: 4px 20px 6px; }
+.ghead .title { font-family: 'Fredoka'; font-weight: 600; font-size: 18px; flex: 1; }
+.gmeta { display: flex; align-items: center; gap: 10px; padding: 0 20px 6px; }
+.timebar { flex: 1; height: 10px; border-radius: 6px; background: var(--sand); overflow: hidden; }
+.timebar > i { display: block; height: 100%; background: var(--teal); border-radius: 6px; transition: width 1s linear, background .3s; }
+.timebar.low > i { background: var(--orange); }
+.pts { font-family: 'Fredoka'; font-weight: 600; font-size: 15px; min-width: 56px; text-align: right; }
+.combo { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; font-weight: 800; font-size: 13px; background: var(--sand); color: var(--ink2); transition: background .2s, color .2s; }
+.combo b { font-family: 'Fredoka'; font-weight: 600; font-size: 15px; }
+.combo.hot { background: var(--orange); color: #fff; }
+.combo.pop { animation: pop .35s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.floatpts { position: absolute; font-family: 'Fredoka'; font-weight: 700; color: var(--orange); font-size: 22px; pointer-events: none; animation: floatup .8s ease-out both; z-index: 30; }
+@keyframes floatup { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-50px); } }
+.hint { text-align: center; font-size: 13px; color: var(--ink2); font-weight: 700; }
+
+/* memory */
+.mgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; align-content: center; }
+.mcard { perspective: 700px; height: 112px; }
+.mcard .inner { position: relative; width: 100%; height: 100%; transition: transform .45s cubic-bezier(.3, 1.3, .5, 1); transform-style: preserve-3d; }
+.mcard.open .inner, .mcard.done .inner { transform: rotateY(180deg); }
+.mcard .face { position: absolute; inset: 0; border-radius: 16px; backface-visibility: hidden; display: grid; place-items: center; padding: 8px; text-align: center; font-weight: 800; font-size: 15px; line-height: 1.15; }
+.mcard .back { background: var(--ink); box-shadow: 0 4px 0 #0f1823; }
+.mcard .back::before { content: ''; width: 18px; height: 22px; background: #2F4459; border-radius: 0 100% 0 100%; transform: rotate(-45deg); }
+.mcard .front { transform: rotateY(180deg); background: var(--paper); box-shadow: 0 4px 0 var(--line), 0 0 0 1.5px var(--line) inset; }
+.mcard .front.t { color: var(--orange); }
+.mcard .front.n { color: var(--teal); }
+.mcard .front small { display: block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); margin-top: 4px; }
+.mcard.done .front { background: var(--teal-soft); box-shadow: 0 4px 0 #bfe0d8; animation: matched .5s ease; }
+.mcard.bad .front { background: var(--orange-soft); }
+@keyframes matched { 50% { transform: rotateY(180deg) scale(1.08); } }
+
+/* sort */
+.sort-area { flex: 1; display: flex; flex-direction: column; gap: 16px; position: relative; }
+.sort-stage { flex: 1; display: grid; place-items: center; position: relative; }
+.sort-card { padding: 26px 30px; border-radius: 22px; background: var(--paper); box-shadow: 0 6px 0 var(--line), var(--shadow); font-family: 'Fredoka'; font-weight: 600; font-size: 30px; touch-action: none; user-select: none; cursor: grab; text-align: center; min-width: 200px; transition: transform .2s; }
+.sort-card.dragging { transition: none; cursor: grabbing; box-shadow: 0 16px 30px -10px rgba(29, 43, 58, .35); }
+.sort-card.enter { animation: cardin .25s cubic-bezier(.3, 1.5, .5, 1) both; }
+.sort-card.shake { animation: shake .35s ease; }
+@keyframes cardin { from { transform: scale(.7); opacity: 0; } }
+@keyframes shake { 25% { transform: translateX(-10px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-5px); } }
+.bins { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.bin { height: 120px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 12px 6px; gap: 6px; font-weight: 800; font-size: 14px; border: 2.5px dashed transparent; transition: transform .15s, border-color .15s; position: relative; }
+.bin.food { background: var(--orange-soft); color: #8a2e08; }
+.bin.travel { background: var(--teal-soft); color: #0b4f49; }
+.bin.home { background: #EEE7F6; color: #4b3f7a; }
+.bin.over { transform: scale(1.05); border-color: currentColor; }
+.bin.flash-ok { animation: binok .45s ease; }
+@keyframes binok { 50% { transform: scale(1.1); } }
+.bin .count { font-family: 'Fredoka'; font-size: 26px; font-weight: 600; }
+
+/* listen */
+.listen-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.playbtn { width: 132px; height: 132px; border-radius: 50%; background: var(--orange); box-shadow: 0 6px 0 #8f2f08; display: grid; place-items: center; position: relative; }
+.playbtn::before { content: ''; border-left: 34px solid #fff; border-top: 22px solid transparent; border-bottom: 22px solid transparent; margin-left: 10px; }
+.playbtn.playing::after { content: ''; position: absolute; inset: -10px; border-radius: 50%; border: 4px solid var(--orange); opacity: .5; animation: ring 1s ease-out infinite; }
+@keyframes ring { from { transform: scale(.9); opacity: .6; } to { transform: scale(1.25); opacity: 0; } }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.opt { min-height: 64px; border-radius: 16px; background: var(--paper); box-shadow: 0 4px 0 var(--line), 0 0 0 1.5px var(--line) inset; font-weight: 800; font-size: 17px; padding: 8px; transition: transform .1s; }
+.opt:active { transform: translateY(2px); }
+.opt.ok { background: var(--teal); color: #fff; box-shadow: 0 4px 0 #0a524c; }
+.opt.no { background: var(--orange-soft); color: var(--orange); box-shadow: 0 4px 0 #f0c9b0; }
+.opts.one { grid-template-columns: 1fr; }
+
+/* right or wrong */
+.rw-stage { flex: 1; position: relative; display: grid; place-items: center; }
+.rw-card { width: 270px; height: 300px; border-radius: 26px; background: var(--paper); box-shadow: 0 8px 0 var(--line), var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; touch-action: none; user-select: none; cursor: grab; position: absolute; transition: transform .25s ease; padding: 20px; text-align: center; }
+.rw-card.back2 { transform: translateY(14px) scale(.94); opacity: .6; pointer-events: none; }
+.rw-card.dragging { transition: none; }
+.rw-card .tw { font-family: 'Fredoka'; font-weight: 600; font-size: 32px; color: var(--orange); }
+.rw-card .eq { width: 28px; height: 10px; border-top: 3px solid var(--ink3); border-bottom: 3px solid var(--ink3); }
+.rw-card .nw { font-family: 'Fredoka'; font-weight: 600; font-size: 28px; color: var(--teal); }
+.rw-stamp { position: absolute; top: 18px; padding: 4px 10px; border-radius: 8px; border: 3px solid; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; opacity: 0; }
+.rw-stamp.r { right: 18px; color: var(--teal); transform: rotate(10deg); }
+.rw-stamp.w { left: 18px; color: var(--orange); transform: rotate(-10deg); }
+.rw-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rw-btns .btn { min-height: 60px; }
+.rw-feedback { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-weight: 800; font-size: 15px; }
+
+/* rescue */
+.rescue-plants { display: flex; justify-content: center; gap: 2px; padding: 4px 0 2px; }
+.rescue-plants .plant { transform: scale(1); margin: 0 2px; }
+.prompt-big { font-family: 'Fredoka'; font-weight: 600; font-size: 34px; text-align: center; }
+
+/* summary */
+.sum-hero { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 8px; }
+.sum-hero .plants { display: flex; justify-content: center; align-items: flex-end; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { background: var(--paper); border-radius: 16px; padding: 14px; box-shadow: var(--shadow); }
+.stat b { font-family: 'Fredoka'; font-weight: 600; font-size: 26px; display: block; }
+.grew { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.grew:last-child { border-bottom: 0; }
+.grew .plant { transform: scale(.72); margin: -10px -9px -6px; }
+.grew .to { width: 14px; height: 2px; background: var(--ink3); position: relative; }
+.grew .to::after { content: ''; position: absolute; right: -1px; top: -3px; width: 6px; height: 6px; border-right: 2px solid var(--ink3); border-top: 2px solid var(--ink3); transform: rotate(45deg); }
+.adslot { border-radius: 16px; border: 1.5px dashed var(--ink3); padding: 12px 14px; display: flex; gap: 12px; align-items: center; background: rgba(255, 253, 249, .5); }
+.adslot .tag { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 3px 6px; border-radius: 5px; background: var(--ink); color: #fff; flex: none; }
+
+.striped { background: repeating-linear-gradient(-45deg, #e9e1d3 0 10px, #f3ece0 10px 20px); display: grid; place-items: center; font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink2); border-radius: 16px; }
+
+/* ad interstitial */
+.adscreen { position: absolute; inset: 0; background: #121c27; color: #fff; z-index: 50; display: flex; flex-direction: column; padding: 54px 20px 30px; gap: 14px; }
+.adscreen .striped { flex: 1; background: repeating-linear-gradient(-45deg, #1e2b3a 0 10px, #243344 10px 20px); color: #9fb0c2; }
+
+/* friends */
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-family: 'Fredoka'; font-weight: 600; font-size: 16px; flex: none; color: #fff; }
+.av-you { background: var(--orange); }
+.av-sofia { background: var(--teal); }
+.av-marco { background: #5B5592; }
+.av-lucia { background: #B7821A; }
+.pair-viz { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: var(--cream); border-radius: 16px; padding: 12px; }
+.pair-viz .side { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; text-align: center; }
+.pair-viz .mid { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.dot-ok { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); display: inline-block; }
+.dot-no { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: inline-block; }
+.board-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+.board-row .rank { font-family: 'Fredoka'; font-weight: 600; width: 18px; color: var(--ink3); }
+.board-row .bar { flex: 1; height: 8px; }
+.board-row.me .rank { color: var(--orange); }
+
+.wotd { border-radius: 26px; padding: 22px; color: var(--ink); background: var(--orange-soft); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; }
+.wotd .big { font-family: 'Fredoka'; font-weight: 700; font-size: 44px; color: var(--orange); line-height: 1; }
+.wotd .tr { font-family: 'Fredoka'; font-weight: 600; font-size: 22px; color: var(--teal); }
+.wotd .ex { background: var(--paper); border-radius: 14px; padding: 12px; font-size: 15px; }
+.wotd .foot { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; color: #8a2e08; }
+.wotd .deco { position: absolute; right: -6px; top: 6px; transform: scale(1.6); transform-origin: top right; }
+
+/* duel */
+.duel-vs { display: flex; align-items: center; justify-content: space-between; padding: 6px 20px 10px; gap: 10px; }
+.duel-vs .p { display: flex; align-items: center; gap: 8px; }
+.duel-vs .score { font-family: 'Fredoka'; font-weight: 600; font-size: 22px; }
+.countdown { flex: 1; display: grid; place-items: center; font-family: 'Fredoka'; font-weight: 700; font-size: 110px; color: var(--orange); }
+.countdown span { animation: pop .6s ease; display: block; }
+.duel-clock { font-family: 'Fredoka'; font-weight: 600; font-size: 20px; min-width: 46px; text-align: center; }
+
+/* journey */
+.jmap { position: relative; display: flex; flex-direction: column; gap: 0; padding: 4px 0 20px; }
+.jband { text-align: center; margin: 12px 0 4px; }
+.jband span { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: var(--sand); color: var(--ink2); }
+.jnode-row { height: 92px; position: relative; }
+.jnode { display: flex; flex-direction: column; align-items: center; gap: 6px; position: absolute; top: 0; width: 120px; margin-left: -60px; z-index: 1; }
+.jdot { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; font-family: 'Fredoka'; font-weight: 700; font-size: 20px; }
+.jnode.done .jdot { background: var(--teal); color: #fff; box-shadow: 0 5px 0 #0a524c; }
+.jnode.current .jdot { background: var(--orange); color: #fff; box-shadow: 0 5px 0 #8f2f08, 0 0 0 6px rgba(194, 65, 12, .18); animation: breathe 2s ease-in-out infinite; }
+.jnode.locked .jdot { background: var(--sand); color: var(--ink3); box-shadow: 0 5px 0 var(--line); }
+.jnode .jl { font-weight: 800; font-size: 13px; text-align: center; }
+.jnode.locked .jl { color: var(--ink3); }
+@keyframes breathe { 50% { box-shadow: 0 5px 0 #8f2f08, 0 0 0 12px rgba(194, 65, 12, .08); } }
+.jpath { position: absolute; left: 0; width: 100%; pointer-events: none; overflow: visible; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+(() => {
+  const WORDS = [{
+    id: 'apple',
+    en: 'apple',
+    es: 'la manzana',
+    cat: 'food',
+    s: 92
+  }, {
+    id: 'bread',
+    en: 'bread',
+    es: 'el pan',
+    cat: 'food',
+    s: 86
+  }, {
+    id: 'water',
+    en: 'water',
+    es: 'el agua',
+    cat: 'food',
+    s: 95
+  }, {
+    id: 'cheese',
+    en: 'cheese',
+    es: 'el queso',
+    cat: 'food',
+    s: 22
+  }, {
+    id: 'chicken',
+    en: 'chicken',
+    es: 'el pollo',
+    cat: 'food',
+    s: 64
+  }, {
+    id: 'coffee',
+    en: 'coffee',
+    es: 'el café',
+    cat: 'food',
+    s: 78
+  }, {
+    id: 'ticket',
+    en: 'ticket',
+    es: 'el boleto',
+    cat: 'travel',
+    s: 70
+  }, {
+    id: 'airport',
+    en: 'airport',
+    es: 'el aeropuerto',
+    cat: 'travel',
+    s: 52
+  }, {
+    id: 'suitcase',
+    en: 'suitcase',
+    es: 'la maleta',
+    cat: 'travel',
+    s: 18
+  }, {
+    id: 'passport',
+    en: 'passport',
+    es: 'el pasaporte',
+    cat: 'travel',
+    s: 44
+  }, {
+    id: 'beach',
+    en: 'beach',
+    es: 'la playa',
+    cat: 'travel',
+    s: 90
+  }, {
+    id: 'train',
+    en: 'train',
+    es: 'el tren',
+    cat: 'travel',
+    s: 31
+  }, {
+    id: 'kitchen',
+    en: 'kitchen',
+    es: 'la cocina',
+    cat: 'home',
+    s: 81
+  }, {
+    id: 'bed',
+    en: 'bed',
+    es: 'la cama',
+    cat: 'home',
+    s: 96
+  }, {
+    id: 'window',
+    en: 'window',
+    es: 'la ventana',
+    cat: 'home',
+    s: 26
+  }, {
+    id: 'key',
+    en: 'key',
+    es: 'la llave',
+    cat: 'home',
+    s: 58
+  }, {
+    id: 'chair',
+    en: 'chair',
+    es: 'la silla',
+    cat: 'home',
+    s: 62
+  }, {
+    id: 'door',
+    en: 'door',
+    es: 'la puerta',
+    cat: 'home',
+    s: 74
+  }];
+  const CATS = ['food', 'travel', 'home'];
+  const T = {
+    en: {
+      tagline: 'Learn the words that matter. No limits.',
+      pickDirection: 'Which way are you learning?',
+      dirEn: 'I speak English',
+      dirEnSub: 'I want to learn Spanish',
+      dirEs: 'Hablo español',
+      dirEsSub: 'Quiero aprender inglés',
+      haveAccount: 'I already have an account',
+      step: 'Step {n} of 3',
+      placeTitle: 'Tap the Spanish words you already know',
+      placeSub: 'No test, no pressure. We skip what you know.',
+      placeResult0: 'Fresh start! We’ll begin at Home with everyday basics.',
+      placeResult1: 'Nice base. We’ll start you at the Market.',
+      placeResult2: 'You know a lot! We’ll fast-track you to the Airport.',
+      continue: 'Continue',
+      goalTitle: 'Pick a daily goal',
+      goalSub: 'New words per day. Reviews never pile up, and you can always play more.',
+      goalEasy: 'Easy',
+      goalSteady: 'Steady',
+      goalSerious: 'Serious',
+      newWords: '{n} new words',
+      mins: '~{n} min',
+      variantTitle: 'Which Spanish?',
+      variantA: 'Latin America',
+      variantB: 'Spain',
+      plant: 'Plant my garden',
+      hi: 'Good afternoon',
+      gardenTitle: 'Your word garden',
+      streak: '{n}-day streak',
+      freeze: '{n} freeze ready',
+      freezeTip: 'Miss a day? A freeze keeps your streak. No guilt.',
+      todayGoal: 'Today',
+      reviews: '{a}/{b} words',
+      danger: '{n} words are wilting',
+      dangerSub: 'Rescue them in about a minute',
+      rescueBtn: 'Rescue',
+      play: 'Play',
+      garden: 'Garden',
+      journey: 'Journey',
+      friends: 'Friends',
+      cat_food: 'Food',
+      cat_travel: 'Travel',
+      cat_home: 'Home',
+      bloom: 'Blooming',
+      leafy: 'Growing',
+      sprout: 'Sprouting',
+      wilt: 'Wilting',
+      hear: 'Hear it',
+      close: 'Close',
+      strength: 'Memory strength',
+      practiseWord: 'Practise this word',
+      gamesTitle: 'Play',
+      queue: '{n} words ready to review',
+      queueSub: 'Every game draws from the same review queue, weakest words first.',
+      g_memory: 'Memory Match',
+      g_memoryD: 'Flip cards, pair each word with its meaning',
+      g_sort: 'Speed Sort',
+      g_sortD: 'Drag or tap words into the right group, beat the clock',
+      g_listen: 'Listen & Tap',
+      g_listenD: 'Hear a word, tap the one you heard',
+      g_rorw: 'Right or Wrong',
+      g_rorwD: 'Is the translation right? Swipe fast',
+      comingSoon: 'Coming later',
+      g_spell: 'Spell It',
+      g_gap: 'Fill the Gap',
+      g_boss: 'Level Boss',
+      g_verb: 'Verb Ladder',
+      unlimited: 'Unlimited. No energy, no hearts, no timers on your practice.',
+      combo: 'Combo',
+      pts: 'pts',
+      matchPairs: 'Find the pairs',
+      moves: '{n} moves',
+      sortHint: 'Drag the word to its group, or tap a group',
+      listenHint: 'Tap play, then pick the word you heard',
+      noSound: 'No sound? Show the meaning',
+      slow: 'Slow',
+      meaning: 'Meaning: {w}',
+      rorwHint: 'Swipe right if correct, left if wrong',
+      right: 'Right',
+      wrong: 'Wrong',
+      itMeans: '{a} = {b}',
+      rescueTitle: 'Rescue round',
+      rescueSub: '{n} plants need water',
+      whatMeans: 'What does this mean?',
+      isRight: 'Is this right?',
+      whichHeard: 'Which one did you hear?',
+      sumTitle: 'Nice session!',
+      sumRescue: 'Plants rescued!',
+      sumPractised: 'Words practised',
+      sumAccuracy: 'Accuracy',
+      sumCombo: 'Best combo',
+      sumPoints: 'Points',
+      sumGrew: 'Your garden grew',
+      sumRevived: '{n} plants revived',
+      sumNone: 'Keep playing to grow more plants.',
+      noLimits: 'No limits today. Play as long as you like.',
+      playAgain: 'Play another round',
+      backGarden: 'Back to garden',
+      adNote: 'A light ad shows next: only between sessions, never mid-game.',
+      removeAds: 'Remove ads',
+      removeAdsOnce: 'one-time $9.99',
+      adLabel: 'Ad',
+      adSkip: 'Skip in {n}',
+      adClose: 'Close ad',
+      adPlaceholder: 'ad creative (AdMob interstitial)',
+      raTitle: 'Remove ads, forever',
+      ra1: 'One payment. No subscription, no renewals.',
+      ra2: 'Every game stays unlimited, with or without ads.',
+      ra3: 'Restores on any of your devices.',
+      raBuy: 'Remove ads · $9.99 once',
+      raDemo: 'Prototype: no real payment happens.',
+      raDone: 'Ads removed (demo)',
+      restore: 'Restore purchase',
+      friendsTitle: 'Learn together',
+      pairTitle: 'Exchange pair',
+      pairSub: 'You learn Spanish. Sofía learns English. Same words, opposite directions.',
+      sharedStreak: '{n}-day shared streak',
+      you: 'You',
+      doneToday: 'Done today',
+      notYet: 'Not yet',
+      nudge: 'Send a friendly nudge',
+      nudged: 'Nudge sent to Sofía',
+      duelTitle: '60-second duel',
+      duelSub: 'Same words, one minute, highest score wins.',
+      challenge: 'Challenge Sofía',
+      boardTitle: 'Friends this week',
+      boardSub: 'Words practised',
+      wotdTitle: 'Word of the day',
+      share: 'Share card',
+      inviteFriend: 'Invite a friend to pair up',
+      duelInvite: 'Challenge sent!',
+      duelWaiting: 'Sofía accepted. Get ready…',
+      duelGo: 'Go!',
+      duelVs: 'vs',
+      duelWin: 'You won!',
+      duelLose: 'So close!',
+      duelTie: 'It’s a tie!',
+      rematch: 'Rematch',
+      shareResult: 'Share result',
+      endEarly: 'End now',
+      duelBoth: 'Both of you just reviewed {n} words. They count in your queues.',
+      wotdShare: 'Opens the Android share sheet with this card (mock)',
+      saveImg: 'Save image',
+      wotdEx: '¿Dónde está la llave?',
+      wotdExT: 'Where is the key?',
+      journeyTitle: 'Your journey',
+      journeySub: 'Every level is a place. Beginner to advanced.',
+      lvBeginner: 'Beginner',
+      lvInter: 'Intermediate',
+      lvAdv: 'Advanced',
+      done: 'Done',
+      current: 'You are here',
+      locked: 'Locked',
+      startHere: 'Practise here',
+      wordsIn: '{n} words',
+      unlockAfter: 'Unlocks after {p}',
+      pl_home: 'Home',
+      pl_market: 'Market',
+      pl_cafe: 'Café',
+      pl_station: 'Train station',
+      pl_airport: 'Airport',
+      pl_hotel: 'Hotel',
+      pl_office: 'Office',
+      pl_doctor: 'Doctor',
+      pl_interview: 'Job interview',
+      exit: 'Exit',
+      toastNoAudio: 'No audio in this preview. Use “Show the meaning”.'
+    },
+    es: {
+      tagline: 'Aprende las palabras que importan. Sin límites.',
+      pickDirection: '¿En qué dirección aprendes?',
+      dirEn: 'I speak English',
+      dirEnSub: 'I want to learn Spanish',
+      dirEs: 'Hablo español',
+      dirEsSub: 'Quiero aprender inglés',
+      haveAccount: 'Ya tengo una cuenta',
+      step: 'Paso {n} de 3',
+      placeTitle: 'Toca las palabras en inglés que ya conoces',
+      placeSub: 'Sin examen ni presión. Saltamos lo que ya sabes.',
+      placeResult0: '¡Empezamos desde cero! Comenzarás en Casa, con lo básico.',
+      placeResult1: 'Buena base. Empezarás en el Mercado.',
+      placeResult2: '¡Sabes mucho! Te adelantamos al Aeropuerto.',
+      continue: 'Continuar',
+      goalTitle: 'Elige tu meta diaria',
+      goalSub: 'Palabras nuevas al día. Los repasos nunca se acumulan y siempre puedes jugar más.',
+      goalEasy: 'Tranqui',
+      goalSteady: 'Constante',
+      goalSerious: 'Intenso',
+      newWords: '{n} palabras nuevas',
+      mins: '~{n} min',
+      variantTitle: '¿Qué inglés?',
+      variantA: 'Estados Unidos',
+      variantB: 'Reino Unido',
+      plant: 'Plantar mi jardín',
+      hi: 'Buenas tardes',
+      gardenTitle: 'Tu jardín de palabras',
+      streak: 'Racha de {n} días',
+      freeze: '{n} protector listo',
+      freezeTip: '¿Faltas un día? El protector cuida tu racha. Sin culpa.',
+      todayGoal: 'Hoy',
+      reviews: '{a}/{b} palabras',
+      danger: '{n} palabras se marchitan',
+      dangerSub: 'Rescátalas en un minuto',
+      rescueBtn: 'Rescatar',
+      play: 'Jugar',
+      garden: 'Jardín',
+      journey: 'Ruta',
+      friends: 'Amigos',
+      cat_food: 'Comida',
+      cat_travel: 'Viajes',
+      cat_home: 'Casa',
+      bloom: 'En flor',
+      leafy: 'Creciendo',
+      sprout: 'Brotando',
+      wilt: 'Marchitándose',
+      hear: 'Escuchar',
+      close: 'Cerrar',
+      strength: 'Fuerza en tu memoria',
+      practiseWord: 'Practicar esta palabra',
+      gamesTitle: 'Jugar',
+      queue: '{n} palabras listas para repasar',
+      queueSub: 'Todos los juegos usan la misma cola de repaso, empezando por las más débiles.',
+      g_memory: 'Memoria',
+      g_memoryD: 'Voltea cartas y une cada palabra con su significado',
+      g_sort: 'Clasifica rápido',
+      g_sortD: 'Arrastra o toca para clasificar antes del tiempo',
+      g_listen: 'Escucha y toca',
+      g_listenD: 'Escucha una palabra y toca la que oíste',
+      g_rorw: '¿Bien o mal?',
+      g_rorwD: '¿La traducción es correcta? Desliza rápido',
+      comingSoon: 'Próximamente',
+      g_spell: 'Delétrealo',
+      g_gap: 'Completa',
+      g_boss: 'Jefe de nivel',
+      g_verb: 'Escalera de verbos',
+      unlimited: 'Ilimitado. Sin energía, sin vidas, sin límites de tiempo para practicar.',
+      combo: 'Combo',
+      pts: 'pts',
+      matchPairs: 'Encuentra las parejas',
+      moves: '{n} jugadas',
+      sortHint: 'Arrastra la palabra a su grupo, o toca un grupo',
+      listenHint: 'Toca reproducir y elige la palabra que oyes',
+      noSound: '¿Sin sonido? Ver el significado',
+      slow: 'Lento',
+      meaning: 'Significado: {w}',
+      rorwHint: 'Desliza a la derecha si es correcto, a la izquierda si no',
+      right: 'Bien',
+      wrong: 'Mal',
+      itMeans: '{a} = {b}',
+      rescueTitle: 'Ronda de rescate',
+      rescueSub: '{n} plantas necesitan agua',
+      whatMeans: '¿Qué significa?',
+      isRight: '¿Es correcto?',
+      whichHeard: '¿Cuál escuchaste?',
+      sumTitle: '¡Buena sesión!',
+      sumRescue: '¡Plantas rescatadas!',
+      sumPractised: 'Palabras practicadas',
+      sumAccuracy: 'Aciertos',
+      sumCombo: 'Mejor combo',
+      sumPoints: 'Puntos',
+      sumGrew: 'Tu jardín creció',
+      sumRevived: '{n} plantas revivieron',
+      sumNone: 'Sigue jugando para que crezcan más plantas.',
+      noLimits: 'Hoy no hay límites. Juega todo lo que quieras.',
+      playAgain: 'Jugar otra ronda',
+      backGarden: 'Volver al jardín',
+      adNote: 'Ahora aparece un anuncio ligero: solo entre sesiones, nunca durante el juego.',
+      removeAds: 'Quitar anuncios',
+      removeAdsOnce: 'pago único $9.99',
+      adLabel: 'Anuncio',
+      adSkip: 'Saltar en {n}',
+      adClose: 'Cerrar anuncio',
+      adPlaceholder: 'anuncio (AdMob intersticial)',
+      raTitle: 'Quita los anuncios para siempre',
+      ra1: 'Un solo pago. Sin suscripción ni renovaciones.',
+      ra2: 'Todos los juegos siguen ilimitados, con o sin anuncios.',
+      ra3: 'Se restaura en todos tus dispositivos.',
+      raBuy: 'Quitar anuncios · $9.99 una vez',
+      raDemo: 'Prototipo: no se realiza ningún pago.',
+      raDone: 'Anuncios quitados (demo)',
+      restore: 'Restaurar compra',
+      friendsTitle: 'Aprendan juntos',
+      pairTitle: 'Pareja de intercambio',
+      pairSub: 'Tú aprendes inglés. Emma aprende español. Las mismas palabras, en direcciones opuestas.',
+      sharedStreak: 'Racha compartida de {n} días',
+      you: 'Tú',
+      doneToday: 'Hecho hoy',
+      notYet: 'Aún no',
+      nudge: 'Enviar un recordatorio amable',
+      nudged: 'Recordatorio enviado a Emma',
+      duelTitle: 'Duelo de 60 segundos',
+      duelSub: 'Las mismas palabras, un minuto, gana quien más puntos haga.',
+      challenge: 'Retar a Emma',
+      boardTitle: 'Amigos esta semana',
+      boardSub: 'Palabras practicadas',
+      wotdTitle: 'Palabra del día',
+      share: 'Compartir tarjeta',
+      inviteFriend: 'Invita a un amigo a formar pareja',
+      duelInvite: '¡Reto enviado!',
+      duelWaiting: 'Emma aceptó. Prepárate…',
+      duelGo: '¡Ya!',
+      duelVs: 'vs',
+      duelWin: '¡Ganaste!',
+      duelLose: '¡Casi!',
+      duelTie: '¡Empate!',
+      rematch: 'Revancha',
+      shareResult: 'Compartir resultado',
+      endEarly: 'Terminar',
+      duelBoth: 'Los dos repasaron {n} palabras. Cuentan en sus colas de repaso.',
+      wotdShare: 'Abre el menú para compartir de Android con esta tarjeta (simulado)',
+      saveImg: 'Guardar imagen',
+      wotdEx: 'Where is the key?',
+      wotdExT: '¿Dónde está la llave?',
+      journeyTitle: 'Tu ruta',
+      journeySub: 'Cada nivel es un lugar. De principiante a avanzado.',
+      lvBeginner: 'Principiante',
+      lvInter: 'Intermedio',
+      lvAdv: 'Avanzado',
+      done: 'Hecho',
+      current: 'Estás aquí',
+      locked: 'Bloqueado',
+      startHere: 'Practicar aquí',
+      wordsIn: '{n} palabras',
+      unlockAfter: 'Se desbloquea después de {p}',
+      pl_home: 'Casa',
+      pl_market: 'Mercado',
+      pl_cafe: 'Cafetería',
+      pl_station: 'Estación',
+      pl_airport: 'Aeropuerto',
+      pl_hotel: 'Hotel',
+      pl_office: 'Oficina',
+      pl_doctor: 'Médico',
+      pl_interview: 'Entrevista de trabajo',
+      exit: 'Salir',
+      toastNoAudio: 'Sin audio en esta vista previa. Usa “Ver el significado”.'
+    }
+  };
+  const PLACEMENT = {
+    en: ['hola', 'gracias', 'el agua', 'la maleta', 'el recibo', 'el ascensor', 'negociar', 'sin embargo', 'aprovechar'],
+    es: ['hello', 'thank you', 'water', 'suitcase', 'receipt', 'elevator', 'to negotiate', 'nevertheless', 'to take advantage']
+  };
+  function fmt(str, vars) {
+    if (!vars) return str;
+    return str.replace(/\{(\w+)\}/g, (m, k) => vars[k] != null ? vars[k] : m);
+  }
+  function makeT(lang) {
+    return (k, vars) => fmt(T[lang] && T[lang][k] || T.en[k] || k, vars);
+  }
+  const target = (w, lang) => lang === 'en' ? w.es : w.en;
+  const native = (w, lang) => lang === 'en' ? w.en : w.es;
+  const stageOf = s => s < 35 ? 'wilt' : s < 60 ? 'sprout' : s < 85 ? 'leafy' : 'bloom';
+  const STAGE_RANK = {
+    wilt: 0,
+    sprout: 1,
+    leafy: 2,
+    bloom: 3
+  };
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function queue(words, n) {
+    const sorted = words.slice().sort((a, b) => a.s + Math.random() * 18 - (b.s + Math.random() * 18));
+    return n ? sorted.slice(0, n) : sorted;
+  }
+  function distractors(words, w, n, field) {
+    const same = shuffle(words.filter(x => x.id !== w.id && x.cat === w.cat));
+    const other = shuffle(words.filter(x => x.id !== w.id && x.cat !== w.cat));
+    return same.concat(other).slice(0, n);
+  }
+  function speak(text, langCode, rate) {
+    try {
+      if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return false;
+      const synth = window.speechSynthesis;
+      synth.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = langCode;
+      u.rate = rate || 0.95;
+      const voices = synth.getVoices() || [];
+      const v = voices.find(x => x.lang && x.lang.replace('_', '-').toLowerCase() === langCode.toLowerCase()) || voices.find(x => x.lang && x.lang.toLowerCase().startsWith(langCode.slice(0, 2)));
+      if (v) u.voice = v;
+      synth.speak(u);
+      return voices.length > 0 || true;
+    } catch (e) {
+      return false;
+    }
+  }
+  const AppCtx = React.createContext(null);
+  const useApp = () => React.useContext(AppCtx);
+  Object.assign(window, {
+    WORDS,
+    CATS,
+    T,
+    PLACEMENT,
+    makeT,
+    target,
+    native,
+    stageOf,
+    STAGE_RANK,
+    shuffle,
+    queue,
+    distractors,
+    speak,
+    AppCtx,
+    useApp
+  });
+})();
+</script>
+<script>
+(() => {
+  const {
+    useState,
+    useEffect,
+    useRef,
+    useCallback
+  } = React;
+  const FLOWER = {
+    food: '#E46F4E',
+    travel: '#F0B23C',
+    home: '#B07CC6'
+  };
+  function Plant({
+    s,
+    cat,
+    glow,
+    scale
+  }) {
+    const st = stageOf(s);
+    return React.createElement("div", {
+      className: `plant ${st} ${glow ? 'glow' : ''}`,
+      style: {
+        '--fc': FLOWER[cat] || FLOWER.food,
+        ...(scale ? {
+          transform: `scale(${scale})`
+        } : {})
+      }
+    }, React.createElement("div", {
+      className: "stem"
+    }, React.createElement("span", {
+      className: "leaf l"
+    }), React.createElement("span", {
+      className: "leaf r"
+    }), React.createElement("span", {
+      className: "leaf l2"
+    }), st === 'bloom' && React.createElement("span", {
+      className: "flower"
+    }), st === 'wilt' && React.createElement("span", {
+      className: "bud"
+    })), React.createElement("div", {
+      className: "pot"
+    }));
+  }
+  function StatusBar() {
+    return React.createElement("div", {
+      className: "statusbar"
+    }, React.createElement("span", null, "9:41"), React.createElement("span", {
+      className: "notch"
+    }), React.createElement("span", {
+      className: "sys"
+    }, React.createElement("b", null), React.createElement("i", null)));
+  }
+  function TabBar({
+    active
+  }) {
+    const {
+      t,
+      go
+    } = useApp();
+    const tabs = [{
+      k: 'home',
+      label: t('garden'),
+      icon: 'ti-garden'
+    }, {
+      k: 'games',
+      label: t('play'),
+      icon: 'ti-play'
+    }, {
+      k: 'journey',
+      label: t('journey'),
+      icon: 'ti-journey'
+    }, {
+      k: 'friends',
+      label: t('friends'),
+      icon: 'ti-friends'
+    }];
+    return React.createElement("nav", {
+      className: "tabbar"
+    }, tabs.map(x => React.createElement("button", {
+      key: x.k,
+      className: `tab ${active === x.k ? 'on' : ''}`,
+      onClick: () => go(x.k)
+    }, React.createElement("span", {
+      className: "ti"
+    }, React.createElement("span", {
+      className: x.icon
+    })), x.label)));
+  }
+  function useCombo() {
+    const [combo, setCombo] = useState(0);
+    const [best, setBest] = useState(0);
+    const [points, setPoints] = useState(0);
+    const [bump, setBump] = useState(0);
+    const {
+      reportCombo
+    } = useApp();
+    const mult = Math.min(4, 1 + Math.floor(combo / 3));
+    const ref = useRef(0);
+    const hit = useCallback(() => {
+      const nc = ref.current + 1;
+      ref.current = nc;
+      const gained = 10 * Math.min(4, 1 + Math.floor(nc / 3));
+      setCombo(nc);
+      setPoints(p => p + gained);
+      setBest(b => Math.max(b, nc));
+      setBump(b => b + 1);
+      reportCombo(nc, gained);
+      return gained;
+    }, [reportCombo]);
+    const miss = useCallback(() => {
+      ref.current = 0;
+      setCombo(0);
+    }, []);
+    return {
+      combo,
+      best,
+      points,
+      mult,
+      hit,
+      miss,
+      bump
+    };
+  }
+  function ComboChip({
+    c
+  }) {
+    const {
+      t
+    } = useApp();
+    return React.createElement("span", {
+      key: c.bump,
+      className: `combo ${c.combo >= 3 ? 'hot' : ''} ${c.bump ? 'pop' : ''}`
+    }, t('combo'), " ", c.combo, " ", React.createElement("b", null, "x", c.mult));
+  }
+  function useCountdown(seconds, running, onEnd) {
+    const [left, setLeft] = useState(seconds);
+    const endRef = useRef(onEnd);
+    endRef.current = onEnd;
+    useEffect(() => {
+      if (!running) return;
+      if (left <= 0) {
+        endRef.current && endRef.current();
+        return;
+      }
+      const id = setTimeout(() => setLeft(l => l - 1), 1000);
+      return () => clearTimeout(id);
+    }, [left, running]);
+    return [left, setLeft];
+  }
+  function GameHeader({
+    title,
+    combo,
+    progress,
+    timeLeft,
+    timeTotal,
+    onExit
+  }) {
+    const {
+      t,
+      go
+    } = useApp();
+    const pct = timeTotal ? timeLeft / timeTotal * 100 : progress * 100;
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "ghead"
+    }, React.createElement("button", {
+      className: "iconbtn x",
+      "aria-label": t('exit'),
+      onClick: onExit || (() => go('games'))
+    }), React.createElement("span", {
+      className: "title"
+    }, title), combo && React.createElement(ComboChip, {
+      c: combo
+    })), React.createElement("div", {
+      className: "gmeta"
+    }, React.createElement("div", {
+      className: `timebar ${timeTotal && timeLeft <= 10 ? 'low' : ''}`
+    }, React.createElement("i", {
+      style: {
+        width: `${Math.max(0, pct)}%`
+      }
+    })), timeTotal ? React.createElement("span", {
+      className: "pts"
+    }, timeLeft, "s") : null, combo && React.createElement("span", {
+      className: "pts"
+    }, combo.points, " ", t('pts'))));
+  }
+  function FloatPts({
+    items
+  }) {
+    return items.map(f => React.createElement("span", {
+      key: f.id,
+      className: "floatpts",
+      style: {
+        left: f.x,
+        top: f.y
+      }
+    }, "+", f.v));
+  }
+  function useFloats() {
+    const [items, setItems] = useState([]);
+    const add = useCallback((v, x, y) => {
+      const id = Math.random();
+      setItems(a => a.concat({
+        id,
+        v,
+        x,
+        y
+      }));
+      setTimeout(() => setItems(a => a.filter(f => f.id !== id)), 850);
+    }, []);
+    return [items, add];
+  }
+  function Sheet({
+    onClose,
+    children
+  }) {
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "scrim",
+      onClick: onClose
+    }), React.createElement("div", {
+      className: "sheet"
+    }, React.createElement("div", {
+      className: "grab"
+    }), children));
+  }
+  function GoalRing({
+    a,
+    b
+  }) {
+    const r = 27,
+      c = 2 * Math.PI * r,
+      p = Math.min(1, a / b);
+    return React.createElement("div", {
+      className: "goalring"
+    }, React.createElement("svg", {
+      width: "64",
+      height: "64",
+      viewBox: "0 0 64 64"
+    }, React.createElement("circle", {
+      cx: "32",
+      cy: "32",
+      r: r,
+      fill: "none",
+      stroke: "#F3EBDD",
+      strokeWidth: "7"
+    }), React.createElement("circle", {
+      cx: "32",
+      cy: "32",
+      r: r,
+      fill: "none",
+      stroke: "#0F766E",
+      strokeWidth: "7",
+      strokeLinecap: "round",
+      strokeDasharray: c,
+      strokeDashoffset: c * (1 - p),
+      style: {
+        transition: 'stroke-dashoffset .6s ease'
+      }
+    })), React.createElement("span", {
+      className: "num"
+    }, a));
+  }
+  Object.assign(window, {
+    Plant,
+    StatusBar,
+    TabBar,
+    useCombo,
+    ComboChip,
+    useCountdown,
+    GameHeader,
+    FloatPts,
+    useFloats,
+    Sheet,
+    GoalRing
+  });
+})();
+</script>
+<script>
+(() => {
+  const {
+    useState,
+    useEffect
+  } = React;
+  function Welcome() {
+    const {
+      t,
+      setLang,
+      go,
+      toast
+    } = useApp();
+    const pick = l => {
+      setLang(l);
+      go('placement');
+    };
+    return React.createElement("div", {
+      className: "onb",
+      "data-screen-label": "Onboarding: direction"
+    }, React.createElement("div", {
+      style: {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        gap: 14
+      }
+    }, React.createElement("div", {
+      className: "brandmark"
+    }, React.createElement(Plant, {
+      s: 95,
+      cat: "food",
+      scale: 1.1
+    }), React.createElement("span", {
+      className: "word"
+    }, "brote")), React.createElement("h2", {
+      style: {
+        fontSize: 30,
+        lineHeight: 1.1
+      }
+    }, "Learn the words that matter.", React.createElement("br", null), React.createElement("span", {
+      style: {
+        color: 'var(--orange)'
+      }
+    }, "Aprende las que importan.")), React.createElement("p", {
+      className: "muted"
+    }, "No limits. Sin l\xEDmites. English \u2194 Espa\xF1ol, both ways.")), React.createElement("div", {
+      className: "col",
+      style: {
+        gap: 12
+      }
+    }, React.createElement("span", {
+      className: "eyebrow"
+    }, "Choose / Elige"), React.createElement("button", {
+      className: "dir-card",
+      onClick: () => pick('en')
+    }, React.createElement("span", {
+      className: "flag en"
+    }, "EN"), React.createElement("span", {
+      className: "grow"
+    }, React.createElement("h3", null, t('dirEn')), React.createElement("span", {
+      className: "muted sm"
+    }, t('dirEnSub'))), React.createElement("span", {
+      className: "arrow-r"
+    })), React.createElement("button", {
+      className: "dir-card",
+      onClick: () => pick('es')
+    }, React.createElement("span", {
+      className: "flag es"
+    }, "ES"), React.createElement("span", {
+      className: "grow"
+    }, React.createElement("h3", null, t('dirEs')), React.createElement("span", {
+      className: "muted sm"
+    }, t('dirEsSub'))), React.createElement("span", {
+      className: "arrow-r"
+    })), React.createElement("button", {
+      className: "link",
+      style: {
+        marginTop: 6
+      },
+      onClick: () => toast('Sign-in is mocked in this prototype')
+    }, "I already have an account \xB7 Ya tengo cuenta")));
+  }
+  function Steps({
+    n
+  }) {
+    return React.createElement("div", {
+      className: "steps"
+    }, [1, 2, 3].map(i => React.createElement("i", {
+      key: i,
+      className: i <= n ? 'on' : ''
+    })));
+  }
+  function Placement() {
+    const {
+      t,
+      lang,
+      go,
+      setPlaceLevel
+    } = useApp();
+    const [sel, setSel] = useState([]);
+    const [shown, setShown] = useState(false);
+    const list = PLACEMENT[lang];
+    const level = sel.length <= 2 ? 0 : sel.length <= 5 ? 1 : 2;
+    const toggle = w => {
+      setShown(false);
+      setSel(s => s.includes(w) ? s.filter(x => x !== w) : s.concat(w));
+    };
+    return React.createElement("div", {
+      className: "onb",
+      "data-screen-label": "Onboarding: placement"
+    }, React.createElement("div", {
+      className: "row"
+    }, React.createElement("button", {
+      className: "iconbtn back",
+      onClick: () => go('welcome')
+    }), React.createElement("div", {
+      className: "grow"
+    }, React.createElement(Steps, {
+      n: 2
+    }))), React.createElement("span", {
+      className: "eyebrow"
+    }, t('step', {
+      n: 2
+    })), React.createElement("h2", {
+      style: {
+        fontSize: 26,
+        lineHeight: 1.15
+      }
+    }, t('placeTitle')), React.createElement("p", {
+      className: "muted"
+    }, t('placeSub')), React.createElement("div", {
+      className: "pchips"
+    }, list.map(w => React.createElement("button", {
+      key: w,
+      className: `pchip ${sel.includes(w) ? 'on' : ''}`,
+      onClick: () => toggle(w)
+    }, w))), React.createElement("div", {
+      style: {
+        flex: 1
+      }
+    }), shown && React.createElement("div", {
+      className: "result-note"
+    }, t('placeResult' + level)), React.createElement("button", {
+      className: "btn primary",
+      onClick: () => {
+        if (!shown) {
+          setShown(true);
+          setPlaceLevel(level);
+          return;
+        }
+        go('goal');
+      }
+    }, t('continue')));
+  }
+  function Goal() {
+    const {
+      t,
+      lang,
+      go,
+      goal,
+      setGoal,
+      accent,
+      setAccent
+    } = useApp();
+    const opts = [{
+      k: 8,
+      label: t('goalEasy'),
+      m: 5,
+      f: 1
+    }, {
+      k: 12,
+      label: t('goalSteady'),
+      m: 10,
+      f: 2
+    }, {
+      k: 15,
+      label: t('goalSerious'),
+      m: 15,
+      f: 3
+    }];
+    return React.createElement("div", {
+      className: "onb",
+      "data-screen-label": "Onboarding: daily goal"
+    }, React.createElement("div", {
+      className: "row"
+    }, React.createElement("button", {
+      className: "iconbtn back",
+      onClick: () => go('placement')
+    }), React.createElement("div", {
+      className: "grow"
+    }, React.createElement(Steps, {
+      n: 3
+    }))), React.createElement("span", {
+      className: "eyebrow"
+    }, t('step', {
+      n: 3
+    })), React.createElement("h2", {
+      style: {
+        fontSize: 26
+      }
+    }, t('goalTitle')), React.createElement("p", {
+      className: "muted"
+    }, t('goalSub')), React.createElement("div", {
+      className: "col"
+    }, opts.map(o => React.createElement("button", {
+      key: o.k,
+      className: `goal-opt ${goal === o.k ? 'on' : ''}`,
+      onClick: () => setGoal(o.k)
+    }, React.createElement("span", {
+      className: "dots"
+    }, [1, 2, 3].map(i => React.createElement("i", {
+      key: i,
+      className: i <= o.f ? 'f' : '',
+      style: {
+        height: 8 + i * 6
+      }
+    }))), React.createElement("span", {
+      className: "grow"
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 18
+      }
+    }, o.label), React.createElement("br", null), React.createElement("span", {
+      className: "muted sm"
+    }, t('newWords', {
+      n: o.k
+    }))), React.createElement("span", {
+      className: "muted sm",
+      style: {
+        fontWeight: 800
+      }
+    }, t('mins', {
+      n: o.m
+    }))))), React.createElement("div", {
+      className: "col",
+      style: {
+        gap: 8
+      }
+    }, React.createElement("span", {
+      className: "eyebrow"
+    }, t('variantTitle')), React.createElement("div", {
+      className: "seg",
+      style: {
+        background: 'var(--sand)'
+      }
+    }, React.createElement("button", {
+      className: accent === 'a' ? 'on' : '',
+      onClick: () => setAccent('a')
+    }, t('variantA')), React.createElement("button", {
+      className: accent === 'b' ? 'on' : '',
+      onClick: () => setAccent('b')
+    }, t('variantB')))), React.createElement("div", {
+      style: {
+        flex: 1
+      }
+    }), React.createElement("button", {
+      className: "btn primary",
+      onClick: () => go('home')
+    }, t('plant')));
+  }
+  function Home() {
+    const {
+      t,
+      lang,
+      words,
+      go,
+      today,
+      goal,
+      streak,
+      freezes,
+      revived,
+      speakWord,
+      toast
+    } = useApp();
+    const [sel, setSel] = useState(null);
+    const [tip, setTip] = useState(false);
+    const danger = words.filter(w => w.s < 35);
+    const selW = sel && words.find(w => w.id === sel);
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Home: word garden"
+    }, React.createElement("div", {
+      className: "row between",
+      style: {
+        paddingTop: 4
+      }
+    }, React.createElement("div", null, React.createElement("span", {
+      className: "muted sm",
+      style: {
+        fontWeight: 700
+      }
+    }, t('hi')), React.createElement("h2", {
+      style: {
+        fontSize: 26
+      }
+    }, t('gardenTitle')))), React.createElement("div", {
+      className: "card row",
+      style: {
+        gap: 14
+      }
+    }, React.createElement(GoalRing, {
+      a: Math.min(today, goal),
+      b: goal
+    }), React.createElement("div", {
+      className: "grow col",
+      style: {
+        gap: 6
+      }
+    }, React.createElement("span", {
+      className: "eyebrow"
+    }, t('todayGoal'), " \xB7 ", t('reviews', {
+      a: Math.min(today, goal),
+      b: goal
+    })), React.createElement("div", {
+      className: "row",
+      style: {
+        gap: 8,
+        flexWrap: 'wrap'
+      }
+    }, React.createElement("span", {
+      className: "chip"
+    }, React.createElement("span", {
+      className: "flame"
+    }), t('streak', {
+      n: streak
+    })), React.createElement("button", {
+      className: "chip",
+      onClick: () => setTip(v => !v)
+    }, React.createElement("span", {
+      className: "frost"
+    }), t('freeze', {
+      n: freezes
+    }))), tip && React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 700
+      }
+    }, t('freezeTip')))), danger.length > 0 ? React.createElement("button", {
+      className: "danger-card",
+      onClick: () => go('rescue')
+    }, React.createElement("span", {
+      className: "mini"
+    }, danger.slice(0, 3).map(w => React.createElement(Plant, {
+      key: w.id,
+      s: w.s,
+      cat: w.cat
+    }))), React.createElement("span", {
+      className: "grow"
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 17,
+        color: '#8a2e08'
+      }
+    }, t('danger', {
+      n: danger.length
+    })), React.createElement("br", null), React.createElement("span", {
+      className: "sm",
+      style: {
+        color: '#8a2e08'
+      }
+    }, t('dangerSub'))), React.createElement("span", {
+      className: "btn primary small"
+    }, t('rescueBtn'))) : null, CATS.map(c => React.createElement("div", {
+      key: c,
+      className: "card bed"
+    }, React.createElement("div", {
+      className: "bed-head"
+    }, React.createElement("h3", null, t('cat_' + c)), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 800
+      }
+    }, words.filter(w => w.cat === c && w.s >= 85).length, "/6 ", t('bloom').toLowerCase())), React.createElement("div", {
+      className: "bed-grid"
+    }, words.filter(w => w.cat === c).map(w => React.createElement("button", {
+      key: w.id,
+      className: `pcell ${w.s < 35 ? 'danger' : ''}`,
+      onClick: () => setSel(w.id),
+      title: target(w, lang)
+    }, React.createElement(Plant, {
+      s: w.s,
+      cat: w.cat,
+      glow: revived.includes(w.id)
+    }), React.createElement("span", {
+      className: "wlabel"
+    }, target(w, lang).replace(/^(el|la|los|las) /, ''))))))), React.createElement("p", {
+      className: "tiny muted",
+      style: {
+        textAlign: 'center'
+      }
+    }, t('unlimited'))), selW && React.createElement(Sheet, {
+      onClose: () => setSel(null)
+    }, React.createElement("div", {
+      className: "row",
+      style: {
+        gap: 14
+      }
+    }, React.createElement(Plant, {
+      s: selW.s,
+      cat: selW.cat,
+      scale: 1.2
+    }), React.createElement("div", {
+      className: "grow"
+    }, React.createElement("span", {
+      className: "eyebrow"
+    }, t('cat_' + selW.cat), " \xB7 ", t(stageOf(selW.s))), React.createElement("h2", {
+      style: {
+        fontSize: 30,
+        color: 'var(--orange)'
+      }
+    }, target(selW, lang)), React.createElement("p", {
+      className: "fred",
+      style: {
+        fontSize: 19,
+        color: 'var(--teal)'
+      }
+    }, native(selW, lang)))), React.createElement("div", {
+      className: "col",
+      style: {
+        gap: 6
+      }
+    }, React.createElement("div", {
+      className: "row between"
+    }, React.createElement("span", {
+      className: "sm muted",
+      style: {
+        fontWeight: 700
+      }
+    }, t('strength')), React.createElement("b", {
+      className: "sm"
+    }, selW.s, "%")), React.createElement("div", {
+      className: "bar"
+    }, React.createElement("i", {
+      style: {
+        width: `${selW.s}%`,
+        background: selW.s < 35 ? 'var(--orange)' : 'var(--teal)'
+      }
+    }))), React.createElement("div", {
+      className: "row"
+    }, React.createElement("button", {
+      className: "btn ghost grow",
+      onClick: () => {
+        if (!speakWord(selW)) toast(t('toastNoAudio'));
+      }
+    }, t('hear')), React.createElement("button", {
+      className: "btn primary grow",
+      onClick: () => go(selW.s < 35 ? 'rescue' : 'game-rorw')
+    }, t('practiseWord')))), React.createElement(TabBar, {
+      active: "home"
+    }));
+  }
+  function Games() {
+    const {
+      t,
+      words,
+      go
+    } = useApp();
+    const due = words.filter(w => w.s < 80).length;
+    const games = [{
+      k: 'memory',
+      r: 'game-memory',
+      mins: 2
+    }, {
+      k: 'sort',
+      r: 'game-sort',
+      mins: 1
+    }, {
+      k: 'listen',
+      r: 'game-listen',
+      mins: 2
+    }, {
+      k: 'rorw',
+      r: 'game-rorw',
+      mins: 1
+    }];
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Games hub"
+    }, React.createElement("h2", {
+      style: {
+        fontSize: 26,
+        paddingTop: 4
+      }
+    }, t('gamesTitle')), React.createElement("div", {
+      className: "card",
+      style: {
+        background: 'var(--teal-soft)'
+      }
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 18,
+        color: '#0b4f49'
+      }
+    }, t('queue', {
+      n: due
+    })), React.createElement("p", {
+      className: "sm",
+      style: {
+        color: '#0b4f49',
+        marginTop: 4
+      }
+    }, t('queueSub'))), games.map(g => React.createElement("button", {
+      key: g.k,
+      className: "game-card",
+      onClick: () => go(g.r)
+    }, React.createElement("span", {
+      className: `gicon ${g.k}`
+    }), React.createElement("span", {
+      className: "grow"
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 18
+      }
+    }, t('g_' + g.k)), React.createElement("br", null), React.createElement("span", {
+      className: "sm muted"
+    }, t('g_' + g.k + 'D'))), React.createElement("span", {
+      className: "arrow-r"
+    }))), React.createElement("span", {
+      className: "eyebrow",
+      style: {
+        marginTop: 4
+      }
+    }, t('comingSoon')), React.createElement("div", {
+      className: "soon-grid"
+    }, ['spell', 'gap', 'boss', 'verb'].map(k => React.createElement("div", {
+      key: k,
+      className: "soon"
+    }, React.createElement("span", {
+      className: "gicon locked"
+    }), t('g_' + k)))), React.createElement("p", {
+      className: "tiny muted",
+      style: {
+        textAlign: 'center'
+      }
+    }, t('unlimited'))), React.createElement(TabBar, {
+      active: "games"
+    }));
+  }
+  function Summary() {
+    const {
+      t,
+      lang,
+      words,
+      session,
+      go,
+      adsRemoved,
+      openRemoveAds,
+      clearRevived
+    } = useApp();
+    const s = session || {
+      answers: 0,
+      correct: 0,
+      best: 0,
+      points: 0,
+      touched: [],
+      start: {},
+      kind: ''
+    };
+    const rescue = s.kind === 'rescue';
+    const touched = words.filter(w => s.touched.includes(w.id));
+    const grew = touched.filter(w => STAGE_RANK[stageOf(w.s)] > STAGE_RANK[stageOf(s.start[w.id] ?? w.s)]);
+    const acc = s.answers ? Math.round(s.correct / s.answers * 100) : 0;
+    const leave = to => {
+      if (to === 'home' && !adsRemoved) go('ad', {
+        next: 'home'
+      });else go(to);
+    };
+    useEffect(() => () => {}, []);
+    return React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Session summary",
+      style: {
+        paddingTop: 10
+      }
+    }, React.createElement("div", {
+      className: "sum-hero"
+    }, React.createElement("div", {
+      className: "plants"
+    }, (grew.length ? grew : touched).slice(0, 5).map(w => React.createElement(Plant, {
+      key: w.id,
+      s: w.s,
+      cat: w.cat,
+      glow: true
+    }))), React.createElement("h2", {
+      style: {
+        fontSize: 30
+      }
+    }, rescue ? t('sumRescue') : t('sumTitle')), React.createElement("p", {
+      className: "muted sm",
+      style: {
+        fontWeight: 700
+      }
+    }, t('noLimits'))), React.createElement("div", {
+      className: "stats"
+    }, React.createElement("div", {
+      className: "stat"
+    }, React.createElement("b", null, touched.length), React.createElement("span", {
+      className: "sm muted"
+    }, t('sumPractised'))), React.createElement("div", {
+      className: "stat"
+    }, React.createElement("b", null, acc, "%"), React.createElement("span", {
+      className: "sm muted"
+    }, t('sumAccuracy'))), React.createElement("div", {
+      className: "stat"
+    }, React.createElement("b", {
+      style: {
+        color: 'var(--orange)'
+      }
+    }, s.best), React.createElement("span", {
+      className: "sm muted"
+    }, t('sumCombo'))), React.createElement("div", {
+      className: "stat"
+    }, React.createElement("b", null, s.points), React.createElement("span", {
+      className: "sm muted"
+    }, t('sumPoints')))), React.createElement("div", {
+      className: "card"
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 17
+      }
+    }, rescue ? t('sumRevived', {
+      n: grew.length
+    }) : t('sumGrew')), React.createElement("div", {
+      style: {
+        marginTop: 6
+      }
+    }, grew.length === 0 && React.createElement("p", {
+      className: "sm muted"
+    }, t('sumNone')), grew.map(w => React.createElement("div", {
+      key: w.id,
+      className: "grew"
+    }, React.createElement(Plant, {
+      s: s.start[w.id],
+      cat: w.cat
+    }), React.createElement("span", {
+      className: "to"
+    }), React.createElement(Plant, {
+      s: w.s,
+      cat: w.cat
+    }), React.createElement("span", {
+      className: "grow"
+    }, React.createElement("b", null, target(w, lang)), " ", React.createElement("span", {
+      className: "muted sm"
+    }, "\xB7 ", native(w, lang))), React.createElement("span", {
+      className: "tiny",
+      style: {
+        fontWeight: 800,
+        color: 'var(--teal)'
+      }
+    }, t(stageOf(w.s))))))), !adsRemoved && React.createElement("div", {
+      className: "adslot"
+    }, React.createElement("span", {
+      className: "tag"
+    }, t('adLabel')), React.createElement("span", {
+      className: "grow tiny muted",
+      style: {
+        fontWeight: 700
+      }
+    }, t('adNote')), React.createElement("button", {
+      className: "link",
+      style: {
+        fontSize: 12,
+        textAlign: 'right'
+      },
+      onClick: openRemoveAds
+    }, t('removeAds'), React.createElement("br", null), React.createElement("span", {
+      className: "muted"
+    }, t('removeAdsOnce')))), React.createElement("div", {
+      className: "col",
+      style: {
+        gap: 12,
+        marginTop: 'auto'
+      }
+    }, React.createElement("button", {
+      className: "btn primary",
+      onClick: () => go('games')
+    }, t('playAgain')), React.createElement("button", {
+      className: "btn ghost",
+      onClick: () => leave('home')
+    }, t('backGarden'))));
+  }
+  function AdBreak() {
+    const {
+      t,
+      go,
+      route,
+      openRemoveAds
+    } = useApp();
+    const [left, setLeft] = useState(5);
+    useEffect(() => {
+      if (left <= 0) return;
+      const id = setTimeout(() => setLeft(l => l - 1), 1000);
+      return () => clearTimeout(id);
+    }, [left]);
+    return React.createElement("div", {
+      className: "adscreen",
+      "data-screen-label": "Ad break (between sessions)"
+    }, React.createElement("div", {
+      className: "row between"
+    }, React.createElement("span", {
+      className: "tiny",
+      style: {
+        fontWeight: 800,
+        letterSpacing: '.08em',
+        textTransform: 'uppercase',
+        color: '#9fb0c2'
+      }
+    }, t('adLabel')), React.createElement("button", {
+      className: "btn small",
+      style: {
+        background: left > 0 ? '#243344' : '#fff',
+        color: left > 0 ? '#9fb0c2' : 'var(--ink)'
+      },
+      disabled: left > 0,
+      onClick: () => go(route.next || 'home')
+    }, left > 0 ? t('adSkip', {
+      n: left
+    }) : t('adClose'))), React.createElement("div", {
+      className: "striped"
+    }, t('adPlaceholder')), React.createElement("button", {
+      className: "btn",
+      style: {
+        background: '#fff',
+        color: 'var(--ink)'
+      },
+      onClick: openRemoveAds
+    }, t('removeAds'), " \xB7 ", t('removeAdsOnce')));
+  }
+  function RemoveAds({
+    onClose
+  }) {
+    const {
+      t,
+      setAdsRemoved,
+      toast,
+      route,
+      go
+    } = useApp();
+    return React.createElement(Sheet, {
+      onClose: onClose
+    }, React.createElement("h2", {
+      style: {
+        fontSize: 24
+      }
+    }, t('raTitle')), React.createElement("div", {
+      className: "col",
+      style: {
+        gap: 8
+      }
+    }, ['ra1', 'ra2', 'ra3'].map(k => React.createElement("div", {
+      key: k,
+      className: "row sm",
+      style: {
+        alignItems: 'flex-start'
+      }
+    }, React.createElement("span", {
+      className: "dot-ok",
+      style: {
+        marginTop: 5,
+        flex: 'none'
+      }
+    }), React.createElement("span", null, t(k))))), React.createElement("button", {
+      className: "btn primary",
+      onClick: () => {
+        setAdsRemoved(true);
+        onClose();
+        toast(t('raDone'));
+        if (route.name === 'ad') go(route.next || 'home');
+      }
+    }, t('raBuy')), React.createElement("div", {
+      className: "row between"
+    }, React.createElement("span", {
+      className: "tiny muted"
+    }, t('raDemo')), React.createElement("button", {
+      className: "link tiny",
+      onClick: () => toast(t('raDemo'))
+    }, t('restore'))));
+  }
+  const PLACES = [{
+    k: 'home',
+    lv: 'lvBeginner',
+    st: 'done',
+    n: 120,
+    ab: 'H'
+  }, {
+    k: 'market',
+    lv: 'lvBeginner',
+    st: 'current',
+    n: 140,
+    ab: 'M'
+  }, {
+    k: 'cafe',
+    lv: 'lvBeginner',
+    st: 'locked',
+    n: 110,
+    ab: 'C'
+  }, {
+    k: 'station',
+    lv: 'lvInter',
+    st: 'locked',
+    n: 160,
+    ab: 'S'
+  }, {
+    k: 'airport',
+    lv: 'lvInter',
+    st: 'locked',
+    n: 180,
+    ab: 'A'
+  }, {
+    k: 'hotel',
+    lv: 'lvInter',
+    st: 'locked',
+    n: 150,
+    ab: 'H'
+  }, {
+    k: 'office',
+    lv: 'lvAdv',
+    st: 'locked',
+    n: 220,
+    ab: 'O'
+  }, {
+    k: 'doctor',
+    lv: 'lvAdv',
+    st: 'locked',
+    n: 200,
+    ab: 'D'
+  }, {
+    k: 'interview',
+    lv: 'lvAdv',
+    st: 'locked',
+    n: 240,
+    ab: 'J'
+  }];
+  function Journey() {
+    const {
+      t,
+      go,
+      placeLevel
+    } = useApp();
+    const [sel, setSel] = useState(null);
+    const curIdx = placeLevel === 2 ? 4 : placeLevel === 0 ? 0 : 1;
+    const places = PLACES.map((p, i) => ({
+      ...p,
+      st: i < curIdx ? 'done' : i === curIdx ? 'current' : 'locked'
+    }));
+    const xs = [50, 72, 50, 28];
+    const selP = sel != null ? places[sel] : null;
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Journey map"
+    }, React.createElement("div", {
+      style: {
+        paddingTop: 4
+      }
+    }, React.createElement("h2", {
+      style: {
+        fontSize: 26
+      }
+    }, t('journeyTitle')), React.createElement("p", {
+      className: "muted sm"
+    }, t('journeySub'))), React.createElement("div", {
+      className: "jmap"
+    }, places.map((p, i) => {
+      const showBand = i === 0 || places[i - 1].lv !== p.lv;
+      const x = xs[i % 4];
+      const nx = xs[(i + 1) % 4];
+      return React.createElement(React.Fragment, {
+        key: p.k
+      }, showBand && React.createElement("div", {
+        className: "jband"
+      }, React.createElement("span", null, t(p.lv))), React.createElement("div", {
+        className: "jnode-row"
+      }, i < places.length - 1 && !(places[i + 1].lv !== p.lv) && React.createElement("svg", {
+        className: "jpath",
+        viewBox: "0 0 100 92",
+        preserveAspectRatio: "none",
+        style: {
+          top: 31,
+          height: 92
+        }
+      }, React.createElement("line", {
+        x1: x,
+        y1: "0",
+        x2: nx,
+        y2: "92",
+        stroke: p.st === 'done' ? '#0F766E' : '#E7DECF',
+        strokeWidth: "3",
+        strokeDasharray: "2 6",
+        strokeLinecap: "round",
+        vectorEffect: "non-scaling-stroke"
+      })), React.createElement("button", {
+        className: `jnode ${p.st}`,
+        style: {
+          left: `${x}%`
+        },
+        onClick: () => setSel(i)
+      }, React.createElement("span", {
+        className: "jdot"
+      }, p.st === 'done' ? '✓' : p.ab), React.createElement("span", {
+        className: "jl"
+      }, t('pl_' + p.k)))));
+    }))), selP && React.createElement(Sheet, {
+      onClose: () => setSel(null)
+    }, React.createElement("span", {
+      className: "eyebrow"
+    }, t(selP.lv), " \xB7 ", t(selP.st === 'current' ? 'current' : selP.st)), React.createElement("h2", {
+      style: {
+        fontSize: 26
+      }
+    }, t('pl_' + selP.k)), React.createElement("p", {
+      className: "muted sm"
+    }, t('wordsIn', {
+      n: selP.n
+    })), selP.st === 'locked' ? React.createElement("p", {
+      className: "sm",
+      style: {
+        fontWeight: 700
+      }
+    }, t('unlockAfter', {
+      p: t('pl_' + places[curIdx].k)
+    })) : React.createElement("button", {
+      className: "btn primary",
+      onClick: () => go('games')
+    }, t('startHere'))), React.createElement(TabBar, {
+      active: "journey"
+    }));
+  }
+  Object.assign(window, {
+    Welcome,
+    Placement,
+    Goal,
+    Home,
+    Games,
+    Summary,
+    AdBreak,
+    RemoveAds,
+    Journey
+  });
+})();
+</script>
+<script>
+(() => {
+  const {
+    useState,
+    useEffect,
+    useRef,
+    useMemo
+  } = React;
+  function relXY(e, el) {
+    const r = (el || e.currentTarget.closest('.screen')).getBoundingClientRect();
+    const src = e.currentTarget.getBoundingClientRect();
+    return [src.left - r.left + src.width / 2 - 14, src.top - r.top];
+  }
+  function MemoryMatch() {
+    const {
+      t,
+      lang,
+      words,
+      answer,
+      finish
+    } = useApp();
+    const set = useMemo(() => queue(words, 6), []);
+    const cards = useMemo(() => shuffle(set.flatMap(w => [{
+      k: w.id + 't',
+      id: w.id,
+      txt: target(w, lang),
+      kind: 't'
+    }, {
+      k: w.id + 'n',
+      id: w.id,
+      txt: native(w, lang),
+      kind: 'n'
+    }])), []);
+    const [open, setOpen] = useState([]);
+    const [done, setDone] = useState([]);
+    const [bad, setBad] = useState([]);
+    const [moves, setMoves] = useState(0);
+    const lock = useRef(false);
+    const missed = useRef(new Set());
+    const combo = useCombo();
+    const [floats, addFloat] = useFloats();
+    const flip = (i, e) => {
+      const c = cards[i];
+      if (lock.current || open.includes(i) || done.includes(c.id)) return;
+      const nxt = open.concat(i);
+      setOpen(nxt);
+      if (nxt.length < 2) return;
+      setMoves(m => m + 1);
+      const [a, b] = nxt.map(j => cards[j]);
+      lock.current = true;
+      if (a.id === b.id) {
+        const pos = relXY(e);
+        setTimeout(() => {
+          setDone(d => d.concat(a.id));
+          setOpen([]);
+          const g = combo.hit();
+          addFloat(g, pos[0], pos[1]);
+          answer(a.id, !missed.current.has(a.id));
+          lock.current = false;
+        }, 300);
+      } else {
+        missed.current.add(a.id);
+        missed.current.add(b.id);
+        setBad(nxt);
+        setTimeout(() => {
+          setOpen([]);
+          setBad([]);
+          combo.miss();
+          lock.current = false;
+        }, 850);
+      }
+    };
+    useEffect(() => {
+      if (done.length === set.length) {
+        const id = setTimeout(() => finish(), 900);
+        return () => clearTimeout(id);
+      }
+    }, [done.length]);
+    return React.createElement(React.Fragment, null, React.createElement(GameHeader, {
+      title: t('g_memory'),
+      combo: combo,
+      progress: done.length / set.length
+    }), React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Game: Memory Match",
+      style: {
+        paddingTop: 10
+      }
+    }, React.createElement("div", {
+      className: "row between"
+    }, React.createElement("span", {
+      className: "hint"
+    }, t('matchPairs')), React.createElement("span", {
+      className: "hint"
+    }, t('moves', {
+      n: moves
+    }))), React.createElement("div", {
+      className: "mgrid"
+    }, cards.map((c, i) => React.createElement("button", {
+      key: c.k,
+      className: `mcard ${open.includes(i) ? 'open' : ''} ${done.includes(c.id) ? 'done' : ''} ${bad.includes(i) ? 'bad' : ''}`,
+      onClick: e => flip(i, e)
+    }, React.createElement("div", {
+      className: "inner"
+    }, React.createElement("div", {
+      className: "face back"
+    }), React.createElement("div", {
+      className: `face front ${c.kind}`
+    }, React.createElement("span", null, c.txt, React.createElement("small", null, c.kind === 't' ? lang === 'en' ? 'ES' : 'EN' : lang === 'en' ? 'EN' : 'ES')))))))), React.createElement(FloatPts, {
+      items: floats
+    }));
+  }
+  function SpeedSort() {
+    const {
+      t,
+      lang,
+      words,
+      answer,
+      finish
+    } = useApp();
+    const deck = useMemo(() => shuffle(queue(words, 12)), []);
+    const [idx, setIdx] = useState(0);
+    const [counts, setCounts] = useState({
+      food: 0,
+      travel: 0,
+      home: 0
+    });
+    const [flash, setFlash] = useState(null);
+    const [shake, setShake] = useState(0);
+    const [drag, setDrag] = useState(null);
+    const [over, setOver] = useState(null);
+    const combo = useCombo();
+    const [floats, addFloat] = useFloats();
+    const ended = useRef(false);
+    const end = () => {
+      if (!ended.current) {
+        ended.current = true;
+        setTimeout(() => finish(), 400);
+      }
+    };
+    const [left] = useCountdown(45, idx < deck.length, end);
+    const w = deck[idx];
+    const choose = (cat, el) => {
+      if (!w || ended.current) return;
+      const ok = w.cat === cat;
+      answer(w.id, ok);
+      if (ok) {
+        const g = combo.hit();
+        setCounts(c => ({
+          ...c,
+          [cat]: c[cat] + 1
+        }));
+        setFlash(cat);
+        if (el) {
+          const r = el.closest('.screen').getBoundingClientRect(),
+            b = el.getBoundingClientRect();
+          addFloat(g, b.left - r.left + b.width / 2 - 14, b.top - r.top - 10);
+        }
+        setTimeout(() => setFlash(null), 450);
+        if (idx + 1 >= deck.length) end();
+        setIdx(i => i + 1);
+      } else {
+        combo.miss();
+        setShake(s => s + 1);
+        setTimeout(() => setIdx(i => {
+          if (i + 1 >= deck.length) end();
+          return i + 1;
+        }), 420);
+      }
+    };
+    const binAt = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      const b = el && el.closest('[data-bin]');
+      return b ? b : null;
+    };
+    const onDown = e => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+      setDrag({
+        sx: e.clientX,
+        sy: e.clientY,
+        dx: 0,
+        dy: 0
+      });
+    };
+    const onMove = e => {
+      if (!drag) return;
+      setDrag({
+        ...drag,
+        dx: e.clientX - drag.sx,
+        dy: e.clientY - drag.sy
+      });
+      e.currentTarget.style.pointerEvents = 'none';
+      const b = binAt(e.clientX, e.clientY);
+      e.currentTarget.style.pointerEvents = '';
+      setOver(b ? b.dataset.bin : null);
+    };
+    const onUp = e => {
+      if (!drag) return;
+      e.currentTarget.style.pointerEvents = 'none';
+      const b = binAt(e.clientX, e.clientY);
+      e.currentTarget.style.pointerEvents = '';
+      setDrag(null);
+      setOver(null);
+      if (b) choose(b.dataset.bin, b);
+    };
+    return React.createElement(React.Fragment, null, React.createElement(GameHeader, {
+      title: t('g_sort'),
+      combo: combo,
+      timeLeft: left,
+      timeTotal: 45
+    }), React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Game: Speed Sort",
+      style: {
+        paddingTop: 10
+      }
+    }, React.createElement("span", {
+      className: "hint"
+    }, t('sortHint')), React.createElement("div", {
+      className: "sort-area"
+    }, React.createElement("div", {
+      className: "sort-stage"
+    }, w && React.createElement("div", {
+      key: w.id + shake,
+      className: `sort-card ${drag ? 'dragging' : 'enter'} ${shake ? 'shake' : ''}`,
+      style: drag ? {
+        transform: `translate(${drag.dx}px, ${drag.dy}px) rotate(${drag.dx / 20}deg)`
+      } : null,
+      onPointerDown: onDown,
+      onPointerMove: onMove,
+      onPointerUp: onUp,
+      onPointerCancel: () => {
+        setDrag(null);
+        setOver(null);
+      }
+    }, target(w, lang)), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        position: 'absolute',
+        bottom: 0,
+        fontWeight: 800
+      }
+    }, Math.min(idx + 1, deck.length), " / ", deck.length)), React.createElement("div", {
+      className: "bins"
+    }, CATS.map(c => React.createElement("button", {
+      key: c,
+      "data-bin": c,
+      className: `bin ${c} ${over === c ? 'over' : ''} ${flash === c ? 'flash-ok' : ''}`,
+      onClick: e => choose(c, e.currentTarget)
+    }, React.createElement("span", {
+      className: "count"
+    }, counts[c]), t('cat_' + c)))))), React.createElement(FloatPts, {
+      items: floats
+    }));
+  }
+  function ListenRound({
+    w,
+    onDone,
+    combo,
+    addFloat,
+    compact
+  }) {
+    const {
+      t,
+      lang,
+      words,
+      answer,
+      speakWord,
+      toast
+    } = useApp();
+    const opts = useMemo(() => shuffle([w].concat(distractors(words, w, 3))), [w.id]);
+    const [picked, setPicked] = useState(null);
+    const [playing, setPlaying] = useState(false);
+    const [hint, setHint] = useState(false);
+    const play = rate => {
+      const ok = speakWord(w, rate);
+      setPlaying(true);
+      setTimeout(() => setPlaying(false), 1100);
+      if (!ok) {
+        toast(t('toastNoAudio'));
+      }
+    };
+    useEffect(() => {
+      const id = setTimeout(() => play(), 350);
+      return () => clearTimeout(id);
+    }, [w.id]);
+    const pick = (o, e) => {
+      if (picked) return;
+      setPicked(o.id);
+      const ok = o.id === w.id;
+      answer(w.id, ok);
+      if (ok) {
+        const g = combo.hit();
+        const p = relXY(e);
+        addFloat(g, p[0], p[1]);
+      } else combo.miss();
+      setTimeout(() => onDone(ok), ok ? 700 : 1300);
+    };
+    return React.createElement("div", {
+      className: "listen-wrap"
+    }, !compact && React.createElement("span", {
+      className: "hint"
+    }, t('listenHint')), React.createElement("button", {
+      className: `playbtn ${playing ? 'playing' : ''}`,
+      "aria-label": "Play",
+      onClick: () => play()
+    }), React.createElement("div", {
+      className: "row",
+      style: {
+        gap: 16
+      }
+    }, React.createElement("button", {
+      className: "link",
+      onClick: () => play(0.55)
+    }, t('slow')), React.createElement("button", {
+      className: "link",
+      onClick: () => setHint(true)
+    }, t('noSound'))), React.createElement("div", {
+      style: {
+        minHeight: 22
+      },
+      className: "sm"
+    }, hint || picked ? React.createElement("b", {
+      style: {
+        color: 'var(--teal)'
+      }
+    }, t('meaning', {
+      w: native(w, lang)
+    })) : null), React.createElement("div", {
+      className: "opts"
+    }, opts.map(o => React.createElement("button", {
+      key: o.id,
+      className: `opt ${picked && o.id === w.id ? 'ok' : ''} ${picked === o.id && o.id !== w.id ? 'no' : ''}`,
+      onClick: e => pick(o, e)
+    }, target(o, lang)))));
+  }
+  function ListenTap() {
+    const {
+      t,
+      words,
+      finish
+    } = useApp();
+    const list = useMemo(() => queue(words, 8), []);
+    const [i, setI] = useState(0);
+    const combo = useCombo();
+    const [floats, addFloat] = useFloats();
+    const next = () => {
+      if (i + 1 >= list.length) finish();else setI(i + 1);
+    };
+    return React.createElement(React.Fragment, null, React.createElement(GameHeader, {
+      title: t('g_listen'),
+      combo: combo,
+      progress: i / list.length
+    }), React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Game: Listen & Tap"
+    }, React.createElement(ListenRound, {
+      key: list[i].id,
+      w: list[i],
+      onDone: next,
+      combo: combo,
+      addFloat: addFloat
+    })), React.createElement(FloatPts, {
+      items: floats
+    }));
+  }
+  function makeRW(words, list) {
+    return list.map(w => {
+      const truth = Math.random() < 0.5;
+      const shown = truth ? w : distractors(words, w, 1)[0];
+      return {
+        w,
+        shown,
+        truth
+      };
+    });
+  }
+  function RWCard({
+    item,
+    onAnswer,
+    combo,
+    addFloat
+  }) {
+    const {
+      t,
+      lang,
+      answer
+    } = useApp();
+    const [drag, setDrag] = useState(null);
+    const [gone, setGone] = useState(null);
+    const [fb, setFb] = useState(null);
+    const decide = sayRight => {
+      if (gone) return;
+      const ok = sayRight === item.truth;
+      answer(item.w.id, ok);
+      setGone(sayRight ? 'r' : 'l');
+      if (ok) {
+        const g = combo.hit();
+        addFloat(g, sayRight ? 260 : 60, 300);
+        setFb(null);
+      } else {
+        combo.miss();
+        setFb(t('itMeans', {
+          a: target(item.w, lang),
+          b: native(item.w, lang)
+        }));
+      }
+      setTimeout(() => onAnswer(ok), ok ? 280 : 1200);
+    };
+    const onDown = e => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+      setDrag({
+        sx: e.clientX,
+        dx: 0
+      });
+    };
+    const onMove = e => {
+      if (drag) setDrag({
+        ...drag,
+        dx: e.clientX - drag.sx
+      });
+    };
+    const onUp = () => {
+      if (!drag) return;
+      const dx = drag.dx;
+      setDrag(null);
+      if (dx > 80) decide(true);else if (dx < -80) decide(false);
+    };
+    const dx = gone ? gone === 'r' ? 420 : -420 : drag ? drag.dx : 0;
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "rw-stage"
+    }, React.createElement("div", {
+      className: `rw-card ${drag ? 'dragging' : ''}`,
+      style: {
+        transform: `translateX(${dx}px) rotate(${dx / 14}deg)`,
+        opacity: gone ? 0 : 1
+      },
+      onPointerDown: onDown,
+      onPointerMove: onMove,
+      onPointerUp: onUp,
+      onPointerCancel: () => setDrag(null)
+    }, React.createElement("span", {
+      className: "rw-stamp r",
+      style: {
+        opacity: Math.max(0, Math.min(1, dx / 80))
+      }
+    }, t('right')), React.createElement("span", {
+      className: "rw-stamp w",
+      style: {
+        opacity: Math.max(0, Math.min(1, -dx / 80))
+      }
+    }, t('wrong')), React.createElement("span", {
+      className: "eyebrow"
+    }, t('isRight')), React.createElement("span", {
+      className: "tw"
+    }, target(item.w, lang)), React.createElement("span", {
+      className: "eq"
+    }), React.createElement("span", {
+      className: "nw"
+    }, native(item.shown, lang))), fb && React.createElement("div", {
+      className: "rw-feedback",
+      style: {
+        color: 'var(--orange)'
+      }
+    }, fb)), React.createElement("div", {
+      className: "rw-btns"
+    }, React.createElement("button", {
+      className: "btn ghost",
+      style: {
+        color: 'var(--orange)'
+      },
+      onClick: () => decide(false)
+    }, "\u2190 ", t('wrong')), React.createElement("button", {
+      className: "btn teal",
+      onClick: () => decide(true)
+    }, t('right'), " \u2192")));
+  }
+  function RightOrWrong() {
+    const {
+      t,
+      words,
+      finish
+    } = useApp();
+    const items = useMemo(() => makeRW(words, queue(words, 12)), []);
+    const [i, setI] = useState(0);
+    const combo = useCombo();
+    const [floats, addFloat] = useFloats();
+    const ended = useRef(false);
+    const end = () => {
+      if (!ended.current) {
+        ended.current = true;
+        finish();
+      }
+    };
+    const [left] = useCountdown(40, i < items.length, end);
+    const next = () => {
+      if (i + 1 >= items.length) end();else setI(i + 1);
+    };
+    return React.createElement(React.Fragment, null, React.createElement(GameHeader, {
+      title: t('g_rorw'),
+      combo: combo,
+      timeLeft: left,
+      timeTotal: 40
+    }), React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Game: Right or Wrong",
+      style: {
+        paddingTop: 10
+      }
+    }, React.createElement("span", {
+      className: "hint"
+    }, t('rorwHint'), " \xB7 ", Math.min(i + 1, items.length), "/", items.length), i < items.length && React.createElement(RWCard, {
+      key: i,
+      item: items[i],
+      onAnswer: next,
+      combo: combo,
+      addFloat: addFloat
+    })), React.createElement(FloatPts, {
+      items: floats
+    }));
+  }
+  function ChoiceRound({
+    w,
+    onDone,
+    combo,
+    addFloat,
+    fast
+  }) {
+    const {
+      t,
+      lang,
+      words,
+      answer
+    } = useApp();
+    const opts = useMemo(() => shuffle([w].concat(distractors(words, w, 3))), [w.id]);
+    const [picked, setPicked] = useState(null);
+    const pick = (o, e) => {
+      if (picked) return;
+      setPicked(o.id);
+      const ok = o.id === w.id;
+      answer(w.id, ok);
+      let g = 0;
+      if (ok) {
+        g = combo.hit();
+        const p = relXY(e);
+        addFloat(g, p[0], p[1]);
+      } else combo.miss();
+      setTimeout(() => onDone(ok, g), fast ? ok ? 350 : 800 : ok ? 650 : 1200);
+    };
+    return React.createElement("div", {
+      className: "listen-wrap"
+    }, React.createElement("span", {
+      className: "eyebrow"
+    }, t('whatMeans')), React.createElement("div", {
+      className: "prompt-big",
+      style: {
+        color: 'var(--orange)'
+      }
+    }, target(w, lang)), React.createElement("div", {
+      className: "opts",
+      style: {
+        marginTop: 10
+      }
+    }, opts.map(o => React.createElement("button", {
+      key: o.id,
+      className: `opt ${picked && o.id === w.id ? 'ok' : ''} ${picked === o.id && o.id !== w.id ? 'no' : ''}`,
+      onClick: e => pick(o, e)
+    }, native(o, lang)))));
+  }
+  function Rescue() {
+    const {
+      t,
+      words,
+      finish,
+      reviveWords
+    } = useApp();
+    const danger = useMemo(() => words.filter(w => w.s < 35).sort((a, b) => a.s - b.s).slice(0, 5), []);
+    const tasks = useMemo(() => {
+      const types = ['choice', 'rorw', 'listen'];
+      const first = danger.map((w, i) => ({
+        w,
+        type: types[i % 3]
+      }));
+      const second = shuffle(danger).map((w, i) => ({
+        w,
+        type: types[(i + 1) % 3]
+      }));
+      return first.concat(second).map((x, i) => ({
+        ...x,
+        key: i,
+        rw: x.type === 'rorw' ? makeRW(words, [x.w])[0] : null
+      }));
+    }, []);
+    const [i, setI] = useState(0);
+    const [saved, setSaved] = useState([]);
+    const combo = useCombo();
+    const [floats, addFloat] = useFloats();
+    const live = words;
+    const done = ok => {
+      const task = tasks[i];
+      const nextSaved = ok && !saved.includes(task.w.id) ? saved.concat(task.w.id) : saved;
+      setSaved(nextSaved);
+      if (i + 1 >= tasks.length) {
+        reviveWords(nextSaved);
+        finish('rescue');
+      } else setI(i + 1);
+    };
+    if (!danger.length) {
+      return React.createElement(React.Fragment, null, React.createElement(GameHeader, {
+        title: t('rescueTitle'),
+        progress: 1
+      }), React.createElement("div", {
+        className: "body"
+      }, React.createElement("p", {
+        className: "muted"
+      }, t('sumNone'))));
+    }
+    const task = tasks[i];
+    return React.createElement(React.Fragment, null, React.createElement(GameHeader, {
+      title: t('rescueTitle'),
+      combo: combo,
+      progress: i / tasks.length
+    }), React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Rescue round",
+      style: {
+        paddingTop: 4
+      }
+    }, React.createElement("div", {
+      className: "col",
+      style: {
+        gap: 0,
+        alignItems: 'center'
+      }
+    }, React.createElement("div", {
+      className: "rescue-plants"
+    }, danger.map(w => {
+      const lw = live.find(x => x.id === w.id);
+      return React.createElement(Plant, {
+        key: w.id,
+        s: saved.includes(w.id) ? Math.max(lw.s, 72) : lw.s,
+        cat: w.cat,
+        glow: saved.includes(w.id)
+      });
+    })), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 800
+      }
+    }, t('rescueSub', {
+      n: danger.length - saved.length
+    }))), task.type === 'choice' && React.createElement(ChoiceRound, {
+      key: task.key,
+      w: task.w,
+      onDone: done,
+      combo: combo,
+      addFloat: addFloat
+    }), task.type === 'listen' && React.createElement(ListenRound, {
+      key: task.key,
+      w: task.w,
+      onDone: done,
+      combo: combo,
+      addFloat: addFloat,
+      compact: true
+    }), task.type === 'rorw' && React.createElement(RWCard, {
+      key: task.key,
+      item: task.rw,
+      onAnswer: done,
+      combo: combo,
+      addFloat: addFloat
+    })), React.createElement(FloatPts, {
+      items: floats
+    }));
+  }
+  Object.assign(window, {
+    MemoryMatch,
+    SpeedSort,
+    ListenTap,
+    RightOrWrong,
+    Rescue,
+    ChoiceRound,
+    relXY
+  });
+})();
+</script>
+<script>
+(() => {
+  const {
+    useState,
+    useEffect,
+    useMemo,
+    useRef
+  } = React;
+  const friendName = lang => lang === 'en' ? 'Sofía' : 'Emma';
+  function Friends() {
+    const {
+      t,
+      lang,
+      go,
+      toast,
+      streak
+    } = useApp();
+    const f = friendName(lang);
+    const board = [{
+      n: f,
+      v: 142,
+      av: 'av-sofia'
+    }, {
+      n: t('you'),
+      v: 128,
+      av: 'av-you',
+      me: true
+    }, {
+      n: 'Marco',
+      v: 97,
+      av: 'av-marco'
+    }, {
+      n: 'Lucía',
+      v: 64,
+      av: 'av-lucia'
+    }];
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Friends: learn together"
+    }, React.createElement("h2", {
+      style: {
+        fontSize: 26,
+        paddingTop: 4
+      }
+    }, t('friendsTitle')), React.createElement("div", {
+      className: "card col",
+      style: {
+        gap: 12
+      }
+    }, React.createElement("div", {
+      className: "row between"
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 18
+      }
+    }, t('pairTitle')), React.createElement("span", {
+      className: "chip",
+      style: {
+        boxShadow: 'none',
+        background: 'var(--orange-soft)',
+        color: '#8a2e08'
+      }
+    }, React.createElement("span", {
+      className: "flame"
+    }), t('sharedStreak', {
+      n: 23
+    }))), React.createElement("div", {
+      className: "pair-viz"
+    }, React.createElement("div", {
+      className: "side"
+    }, React.createElement("span", {
+      className: "avatar av-you"
+    }, lang === 'en' ? 'Y' : 'T'), React.createElement("b", {
+      className: "sm"
+    }, t('you')), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 700
+      }
+    }, lang === 'en' ? 'EN \u2192 ES' : 'ES \u2192 EN'), React.createElement("span", {
+      className: "tiny",
+      style: {
+        fontWeight: 800,
+        color: 'var(--teal)'
+      }
+    }, React.createElement("span", {
+      className: "dot-ok"
+    }), " ", t('doneToday'))), React.createElement("div", {
+      className: "mid"
+    }, React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 800
+      }
+    }, "la llave"), React.createElement("span", {
+      style: {
+        width: 40,
+        height: 2,
+        background: 'var(--line)'
+      }
+    }), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 800
+      }
+    }, "key")), React.createElement("div", {
+      className: "side"
+    }, React.createElement("span", {
+      className: "avatar av-sofia"
+    }, f[0]), React.createElement("b", {
+      className: "sm"
+    }, f), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 700
+      }
+    }, lang === 'en' ? 'ES \u2192 EN' : 'EN \u2192 ES'), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 800
+      }
+    }, React.createElement("span", {
+      className: "dot-no"
+    }), " ", t('notYet')))), React.createElement("p", {
+      className: "sm muted"
+    }, t('pairSub')), React.createElement("button", {
+      className: "btn ghost small",
+      onClick: () => toast(t('nudged'))
+    }, t('nudge'))), React.createElement("div", {
+      className: "card col",
+      style: {
+        gap: 10,
+        background: 'var(--ink)',
+        color: '#fff'
+      }
+    }, React.createElement("div", {
+      className: "row between"
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 20
+      }
+    }, t('duelTitle')), React.createElement("span", {
+      className: "fred",
+      style: {
+        fontSize: 26,
+        color: 'var(--sun)'
+      }
+    }, "60s")), React.createElement("p", {
+      className: "sm",
+      style: {
+        color: '#c8d2dd'
+      }
+    }, t('duelSub')), React.createElement("button", {
+      className: "btn primary",
+      onClick: () => go('duel')
+    }, t('challenge'))), React.createElement("div", {
+      className: "card"
+    }, React.createElement("div", {
+      className: "row between"
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 18
+      }
+    }, t('boardTitle')), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 800
+      }
+    }, t('boardSub'))), board.map((b, i) => React.createElement("div", {
+      key: b.n,
+      className: `board-row ${b.me ? 'me' : ''}`
+    }, React.createElement("span", {
+      className: "rank"
+    }, i + 1), React.createElement("span", {
+      className: `avatar ${b.av}`,
+      style: {
+        width: 32,
+        height: 32,
+        fontSize: 14
+      }
+    }, b.n[0]), React.createElement("span", {
+      style: {
+        width: 62,
+        fontWeight: 800
+      },
+      className: "sm"
+    }, b.n), React.createElement("div", {
+      className: "bar"
+    }, React.createElement("i", {
+      style: {
+        width: `${b.v / 142 * 100}%`,
+        background: b.me ? 'var(--orange)' : 'var(--teal)'
+      }
+    })), React.createElement("b", {
+      className: "sm",
+      style: {
+        width: 30,
+        textAlign: 'right'
+      }
+    }, b.v)))), React.createElement("button", {
+      className: "game-card",
+      onClick: () => go('wotd')
+    }, React.createElement("span", {
+      className: "gicon memory"
+    }), React.createElement("span", {
+      className: "grow"
+    }, React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 18
+      }
+    }, t('wotdTitle')), React.createElement("br", null), React.createElement("span", {
+      className: "sm muted"
+    }, lang === 'en' ? 'la llave · key' : 'key · la llave')), React.createElement("span", {
+      className: "arrow-r"
+    })), React.createElement("button", {
+      className: "btn ghost",
+      onClick: () => toast(lang === 'en' ? 'Invite link copied (mock)' : 'Enlace de invitación copiado (simulado)')
+    }, t('inviteFriend'))), React.createElement(TabBar, {
+      active: "friends"
+    }));
+  }
+  function Wotd() {
+    const {
+      t,
+      lang,
+      go,
+      toast,
+      words,
+      speakWord
+    } = useApp();
+    const w = words.find(x => x.id === 'key');
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "topbar"
+    }, React.createElement("button", {
+      className: "iconbtn back",
+      onClick: () => go('friends')
+    }), React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 18
+      }
+    }, t('wotdTitle'))), React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Word of the day card"
+    }, React.createElement("div", {
+      className: "wotd"
+    }, React.createElement("div", {
+      className: "deco"
+    }, React.createElement(Plant, {
+      s: 95,
+      cat: "home"
+    })), React.createElement("span", {
+      className: "eyebrow",
+      style: {
+        color: '#8a2e08'
+      }
+    }, t('wotdTitle'), " \xB7 21 Nov"), React.createElement("div", {
+      className: "big"
+    }, target(w, lang)), React.createElement("div", {
+      className: "tr"
+    }, native(w, lang)), React.createElement("div", {
+      className: "ex"
+    }, React.createElement("b", null, t('wotdEx')), React.createElement("br", null), React.createElement("span", {
+      className: "muted"
+    }, t('wotdExT'))), React.createElement("div", {
+      className: "foot"
+    }, React.createElement("span", null, "brote \xB7 ", lang === 'en' ? 'learn Spanish, no limits' : 'aprende inglés sin límites'), React.createElement("span", null, lang === 'en' ? 'EN → ES' : 'ES → EN'))), React.createElement("button", {
+      className: "btn ghost",
+      onClick: () => {
+        if (!speakWord(w)) toast(t('toastNoAudio'));
+      }
+    }, t('hear')), React.createElement("div", {
+      className: "row"
+    }, React.createElement("button", {
+      className: "btn ghost grow",
+      onClick: () => toast(t('saveImg') + ' (mock)')
+    }, t('saveImg')), React.createElement("button", {
+      className: "btn primary grow",
+      onClick: () => toast(t('wotdShare'))
+    }, t('share')))));
+  }
+  function Duel() {
+    const {
+      t,
+      lang,
+      words,
+      go,
+      toast
+    } = useApp();
+    const f = friendName(lang);
+    const [phase, setPhase] = useState('invite');
+    const [count, setCount] = useState(3);
+    const [left, setLeft] = useState(60);
+    const [me, setMe] = useState(0);
+    const [them, setThem] = useState(0);
+    const [i, setI] = useState(0);
+    const [n, setN] = useState(0);
+    const list = useMemo(() => queue(words).concat(shuffle(words)).concat(shuffle(words)), []);
+    const combo = useCombo();
+    const [floats, addFloat] = useFloats();
+    useEffect(() => {
+      if (phase === 'invite') {
+        const id = setTimeout(() => setPhase('waiting'), 1400);
+        return () => clearTimeout(id);
+      }
+      if (phase === 'waiting') {
+        if (count <= 0) {
+          setPhase('play');
+          return;
+        }
+        const id = setTimeout(() => setCount(c => c - 1), 800);
+        return () => clearTimeout(id);
+      }
+      if (phase === 'play') {
+        if (left <= 0) {
+          setPhase('result');
+          return;
+        }
+        const id = setTimeout(() => {
+          setLeft(l => l - 1);
+          if (Math.random() < 0.55) setThem(s => s + 10 * (1 + Math.floor(Math.random() * 3)));
+        }, 1000);
+        return () => clearTimeout(id);
+      }
+    }, [phase, count, left]);
+    const onDone = (ok, pts) => {
+      setN(x => x + 1);
+      if (ok) setMe(s => s + pts);
+      setI(x => (x + 1) % list.length);
+    };
+    const header = React.createElement("div", {
+      className: "duel-vs"
+    }, React.createElement("div", {
+      className: "p"
+    }, React.createElement("span", {
+      className: "avatar av-you"
+    }, lang === 'en' ? 'Y' : 'T'), React.createElement("span", {
+      className: "score"
+    }, me)), phase === 'play' ? React.createElement("span", {
+      className: "duel-clock"
+    }, left, "s") : React.createElement("span", {
+      className: "muted fred"
+    }, t('duelVs')), React.createElement("div", {
+      className: "p"
+    }, React.createElement("span", {
+      className: "score"
+    }, them), React.createElement("span", {
+      className: "avatar av-sofia"
+    }, f[0])));
+    if (phase === 'invite' || phase === 'waiting') {
+      return React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "topbar"
+      }, React.createElement("button", {
+        className: "iconbtn x",
+        onClick: () => go('friends')
+      }), React.createElement("b", {
+        className: "fred",
+        style: {
+          fontSize: 18
+        }
+      }, t('duelTitle'))), header, React.createElement("div", {
+        className: "body",
+        "data-screen-label": "Duel: invite",
+        style: {
+          alignItems: 'center',
+          justifyContent: 'center'
+        }
+      }, React.createElement("h2", {
+        style: {
+          fontSize: 24,
+          textAlign: 'center'
+        }
+      }, phase === 'invite' ? t('duelInvite') : t('duelWaiting')), React.createElement("div", {
+        className: "countdown",
+        style: {
+          flex: 'none',
+          height: 160
+        }
+      }, phase === 'waiting' ? React.createElement("span", {
+        key: count
+      }, count > 0 ? count : t('duelGo')) : React.createElement("span", {
+        className: "muted",
+        style: {
+          fontSize: 22,
+          fontWeight: 600
+        }
+      }, "\u2026"))));
+    }
+    if (phase === 'play') {
+      return React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "topbar"
+      }, React.createElement("button", {
+        className: "iconbtn x",
+        onClick: () => go('friends')
+      }), React.createElement("b", {
+        className: "fred grow",
+        style: {
+          fontSize: 18
+        }
+      }, t('duelTitle')), React.createElement(ComboChip, {
+        c: combo
+      })), header, React.createElement("div", {
+        className: "gmeta"
+      }, React.createElement("div", {
+        className: `timebar ${left <= 10 ? 'low' : ''}`
+      }, React.createElement("i", {
+        style: {
+          width: `${left / 60 * 100}%`
+        }
+      })), React.createElement("button", {
+        className: "link tiny",
+        onClick: () => setLeft(0)
+      }, t('endEarly'))), React.createElement("div", {
+        className: "body",
+        "data-screen-label": "Duel: play"
+      }, React.createElement(ChoiceRound, {
+        key: i + '-' + n,
+        w: list[i],
+        onDone: onDone,
+        combo: combo,
+        addFloat: addFloat,
+        fast: true
+      })), React.createElement(FloatPts, {
+        items: floats
+      }));
+    }
+    const res = me > them ? 'duelWin' : me < them ? 'duelLose' : 'duelTie';
+    return React.createElement(React.Fragment, null, React.createElement("div", {
+      className: "topbar"
+    }, React.createElement("button", {
+      className: "iconbtn x",
+      onClick: () => go('friends')
+    }), React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 18
+      }
+    }, t('duelTitle'))), React.createElement("div", {
+      className: "body",
+      "data-screen-label": "Duel: result",
+      style: {
+        alignItems: 'stretch'
+      }
+    }, React.createElement("div", {
+      className: "col",
+      style: {
+        alignItems: 'center',
+        gap: 6,
+        paddingTop: 10
+      }
+    }, React.createElement("h2", {
+      style: {
+        fontSize: 36,
+        color: res === 'duelWin' ? 'var(--teal)' : 'var(--orange)'
+      }
+    }, t(res))), React.createElement("div", {
+      className: "card row",
+      style: {
+        justifyContent: 'space-around',
+        padding: 22
+      }
+    }, React.createElement("div", {
+      className: "col",
+      style: {
+        alignItems: 'center',
+        gap: 6
+      }
+    }, React.createElement("span", {
+      className: "avatar av-you",
+      style: {
+        width: 56,
+        height: 56,
+        fontSize: 22
+      }
+    }, lang === 'en' ? 'Y' : 'T'), React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 30
+      }
+    }, me), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 800
+      }
+    }, t('you'))), React.createElement("span", {
+      className: "fred muted",
+      style: {
+        fontSize: 20
+      }
+    }, t('duelVs')), React.createElement("div", {
+      className: "col",
+      style: {
+        alignItems: 'center',
+        gap: 6
+      }
+    }, React.createElement("span", {
+      className: "avatar av-sofia",
+      style: {
+        width: 56,
+        height: 56,
+        fontSize: 22
+      }
+    }, f[0]), React.createElement("b", {
+      className: "fred",
+      style: {
+        fontSize: 30
+      }
+    }, them), React.createElement("span", {
+      className: "tiny muted",
+      style: {
+        fontWeight: 800
+      }
+    }, f))), React.createElement("div", {
+      className: "stats"
+    }, React.createElement("div", {
+      className: "stat"
+    }, React.createElement("b", {
+      style: {
+        color: 'var(--orange)'
+      }
+    }, combo.best), React.createElement("span", {
+      className: "sm muted"
+    }, t('sumCombo'))), React.createElement("div", {
+      className: "stat"
+    }, React.createElement("b", null, n), React.createElement("span", {
+      className: "sm muted"
+    }, t('sumPractised')))), React.createElement("p", {
+      className: "sm muted",
+      style: {
+        textAlign: 'center'
+      }
+    }, t('duelBoth', {
+      n
+    })), React.createElement("div", {
+      className: "col",
+      style: {
+        gap: 12,
+        marginTop: 'auto'
+      }
+    }, React.createElement("button", {
+      className: "btn primary",
+      onClick: () => {
+        setMe(0);
+        setThem(0);
+        setLeft(60);
+        setCount(3);
+        setN(0);
+        setPhase('invite');
+      }
+    }, t('rematch')), React.createElement("button", {
+      className: "btn ghost",
+      onClick: () => toast(t('wotdShare'))
+    }, t('shareResult')))));
+  }
+  Object.assign(window, {
+    Friends,
+    Wotd,
+    Duel
+  });
+})();
+</script>
+<script>
+(() => {
+  const {
+    useState,
+    useRef,
+    useCallback,
+    useEffect
+  } = React;
+  const GAME_ROUTES = ['game-memory', 'game-sort', 'game-listen', 'game-rorw', 'rescue'];
+  const NO_STATUS_PAD = ['ad'];
+  const GUIDE = [{
+    h: 'Onboarding',
+    items: [{
+      label: 'Start (pick direction)',
+      r: 'welcome'
+    }, {
+      label: 'Placement',
+      r: 'placement'
+    }, {
+      label: 'Daily goal',
+      r: 'goal'
+    }]
+  }, {
+    h: 'Core',
+    items: [{
+      label: 'Word garden',
+      r: 'home'
+    }, {
+      label: 'Words in danger: rescue',
+      r: 'rescue'
+    }, {
+      label: 'Games hub',
+      r: 'games'
+    }, {
+      label: 'Journey map',
+      r: 'journey'
+    }]
+  }, {
+    h: 'Games (playable)',
+    items: [{
+      label: 'Memory Match',
+      r: 'game-memory'
+    }, {
+      label: 'Speed Sort',
+      r: 'game-sort'
+    }, {
+      label: 'Listen & Tap',
+      r: 'game-listen'
+    }, {
+      label: 'Right or Wrong',
+      r: 'game-rorw'
+    }]
+  }, {
+    h: 'After a session',
+    items: [{
+      label: 'Session summary',
+      r: 'summary'
+    }, {
+      label: 'Ad break placeholder',
+      r: 'ad'
+    }]
+  }, {
+    h: 'Learn together',
+    items: [{
+      label: 'Friends & exchange pair',
+      r: 'friends'
+    }, {
+      label: '60-second duel',
+      r: 'duel'
+    }, {
+      label: 'Word of the day card',
+      r: 'wotd'
+    }]
+  }];
+  function freshWords() {
+    return WORDS.map(w => ({
+      ...w
+    }));
+  }
+  function App() {
+    const [lang, setLang] = useState('en');
+    const [accent, setAccent] = useState('a');
+    const [route, setRoute] = useState({
+      name: 'welcome'
+    });
+    const [words, setWords] = useState(freshWords);
+    const [goal, setGoal] = useState(12);
+    const [today, setToday] = useState(7);
+    const [placeLevel, setPlaceLevel] = useState(1);
+    const [session, setSession] = useState(null);
+    const [revived, setRevived] = useState([]);
+    const [adsRemoved, setAdsRemoved] = useState(false);
+    const [raOpen, setRaOpen] = useState(false);
+    const [toastMsg, setToastMsg] = useState(null);
+    const [navKey, setNavKey] = useState(0);
+    const wordsRef = useRef(words);
+    wordsRef.current = words;
+    const toastTimer = useRef(null);
+    const t = makeT(lang);
+    const toast = useCallback(m => {
+      setToastMsg(m);
+      clearTimeout(toastTimer.current);
+      toastTimer.current = setTimeout(() => setToastMsg(null), 2600);
+    }, []);
+    const newSession = kind => ({
+      kind,
+      answers: 0,
+      correct: 0,
+      best: 0,
+      points: 0,
+      touched: [],
+      start: Object.fromEntries(wordsRef.current.map(w => [w.id, w.s]))
+    });
+    const go = useCallback((name, params) => {
+      if (GAME_ROUTES.includes(name)) setSession(newSession(name));
+      if (name !== 'home' && name !== 'summary' && name !== 'ad') setRevived([]);
+      setRoute({
+        name,
+        ...(params || {})
+      });
+      setNavKey(k => k + 1);
+      setRaOpen(false);
+    }, []);
+    const answer = useCallback((id, ok) => {
+      setWords(ws => ws.map(w => w.id === id ? {
+        ...w,
+        s: ok ? Math.min(100, w.s + 16) : Math.max(5, w.s - 10)
+      } : w));
+      setSession(s => s && {
+        ...s,
+        answers: s.answers + 1,
+        correct: s.correct + (ok ? 1 : 0),
+        touched: s.touched.includes(id) ? s.touched : s.touched.concat(id)
+      });
+      setToday(x => x + 1);
+    }, []);
+    const reportCombo = useCallback((c, pts) => {
+      setSession(s => s && {
+        ...s,
+        best: Math.max(s.best, c),
+        points: s.points + pts
+      });
+    }, []);
+    const reviveWords = useCallback(ids => {
+      setWords(ws => ws.map(w => ids.includes(w.id) ? {
+        ...w,
+        s: Math.max(w.s, 72)
+      } : w));
+      setRevived(ids);
+    }, []);
+    const finish = useCallback(kind => {
+      setRoute({
+        name: 'summary'
+      });
+      setNavKey(k => k + 1);
+    }, []);
+    const speakWord = useCallback((w, rate) => {
+      const code = lang === 'en' ? accent === 'b' ? 'es-ES' : 'es-MX' : accent === 'b' ? 'en-GB' : 'en-US';
+      return speak(target(w, lang), code, rate);
+    }, [lang, accent]);
+    const jump = (r, l) => {
+      if (l) setLang(l);
+      if (r === 'summary' && !session) {
+        const s = newSession('demo');
+        const ids = ['chicken', 'airport', 'chair', 'key'];
+        s.touched = ids;
+        s.answers = 9;
+        s.correct = 8;
+        s.best = 6;
+        s.points = 140;
+        setWords(ws => ws.map(w => ids.includes(w.id) ? {
+          ...w,
+          s: Math.min(100, w.s + 24)
+        } : w));
+        setSession(s);
+      }
+      if (r === 'rescue' && !words.some(w => w.s < 35)) {
+        const f = freshWords();
+        wordsRef.current = f;
+        setWords(f);
+      }
+      go(r);
+    };
+    const reset = () => {
+      setWords(freshWords());
+      setSession(null);
+      setRevived([]);
+      setAdsRemoved(false);
+      setToday(7);
+      go('welcome');
+    };
+    const ctx = {
+      lang,
+      setLang,
+      accent,
+      setAccent,
+      t,
+      route,
+      go,
+      words,
+      answer,
+      reportCombo,
+      finish,
+      session,
+      goal,
+      setGoal,
+      today,
+      streak: 12,
+      freezes: 1,
+      revived,
+      reviveWords,
+      placeLevel,
+      setPlaceLevel,
+      adsRemoved,
+      setAdsRemoved,
+      openRemoveAds: () => setRaOpen(true),
+      toast,
+      speakWord
+    };
+    const screens = {
+      welcome: Welcome,
+      placement: Placement,
+      goal: Goal,
+      home: Home,
+      games: Games,
+      journey: Journey,
+      'game-memory': MemoryMatch,
+      'game-sort': SpeedSort,
+      'game-listen': ListenTap,
+      'game-rorw': RightOrWrong,
+      rescue: Rescue,
+      summary: Summary,
+      ad: AdBreak,
+      friends: Friends,
+      duel: Duel,
+      wotd: Wotd
+    };
+    const Screen = screens[route.name] || Home;
+    return React.createElement(AppCtx.Provider, {
+      value: ctx
+    }, React.createElement("div", {
+      className: "stage"
+    }, React.createElement("aside", {
+      className: "guide"
+    }, React.createElement("h1", {
+      className: "fred"
+    }, React.createElement(Plant, {
+      s: 95,
+      cat: "food",
+      scale: 0.8
+    }), "brote"), React.createElement("p", {
+      className: "lead"
+    }, "Clickable prototype of the EN\u2194ES vocab app. Tap through the phone, or jump to any screen here. Sample of 18 words only."), React.createElement("div", {
+      className: "col",
+      style: {
+        gap: 6
+      }
+    }, React.createElement("span", {
+      className: "eyebrow"
+    }, "Learner (UI language)"), React.createElement("div", {
+      className: "seg"
+    }, React.createElement("button", {
+      className: lang === 'en' ? 'on' : '',
+      onClick: () => setLang('en')
+    }, "English speaker"), React.createElement("button", {
+      className: lang === 'es' ? 'on' : '',
+      onClick: () => setLang('es')
+    }, "Hispanohablante"))), GUIDE.map(g => React.createElement("div", {
+      key: g.h,
+      className: "guide-group"
+    }, React.createElement("h4", null, g.h), g.items.map(it => React.createElement("button", {
+      key: it.r,
+      className: `guide-link ${route.name === it.r ? 'on' : ''}`,
+      onClick: () => jump(it.r)
+    }, it.label)))), React.createElement("div", {
+      className: "row",
+      style: {
+        gap: 12
+      }
+    }, React.createElement("button", {
+      className: "link",
+      onClick: reset
+    }, "Reset demo"), React.createElement("span", {
+      className: "note"
+    }, adsRemoved ? 'Ads removed (demo)' : 'Ads on (demo)')), React.createElement("p", {
+      className: "note"
+    }, "Mocked: accounts, friends, payments, share sheet, ads. Audio uses the browser\u2019s speech voices when available.")), React.createElement("div", {
+      className: "phone"
+    }, React.createElement("div", {
+      className: "screen",
+      lang: lang
+    }, React.createElement(StatusBar, null), React.createElement(Screen, {
+      key: route.name + navKey
+    }), raOpen && React.createElement(RemoveAds, {
+      onClose: () => setRaOpen(false)
+    }), toastMsg && React.createElement("div", {
+      className: "toast",
+      key: toastMsg
+    }, toastMsg)))));
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));
+})();
+</script>
+</body>
+</html>
